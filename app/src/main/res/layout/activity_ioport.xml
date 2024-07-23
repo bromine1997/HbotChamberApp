@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IoPortActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Analog Input"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+
+                <!-- O2 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="O2 (%)"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/o2_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:text="0 %"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+
+
+                <!--   -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CO2(%)"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/co2_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:text="0 %"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+
+
+                <!--   -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Humidity (%)"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/humidity_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:text="0 %"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <!--   -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Temp (°C)"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/temp_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:text="0 °C"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <!--   -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pressure (ATA)"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/pressure_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:text="0 ATA"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <!--   -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FLOW (lpm)"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/flow_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/edit_text"
+                    android:text="0 lpm"
+                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textSize="20sp" />
+                <!--   -->
+
+
+                <!-- Add more controls for CO2, Humidity, Temp, Pressure, Flow -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Analog, Digital Output"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <!-- Proportion (Press) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Proportion (Press)"
+                    android:textSize="20sp" />
+
+                <android.widget.Button
+                    android:id="@+id/controlProportionPressButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round"
+                    android:text="Control"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp" />
+
+                <!-- Proportion (Press) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="solenoid (Press)"
+                    android:textSize="20sp" />
+
+                <android.widget.Button
+                    android:id="@+id/controlSolenoidPressButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round"
+                    android:text="Control"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Proportion (Press)"
+                    android:textSize="20sp" />
+
+
+                <!-- Proportion (Press) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/controlProportionPressDown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/round"
+                        android:text="Down"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/controlProportionPressUP"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="UP"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Proportion (vent)"
+                    android:textSize="20sp" />
+
+                <android.widget.Button
+                    android:id="@+id/controlProportionVentButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round"
+                    android:text="Control"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp" />
+
+
+                <!-- Proportion (Press) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="solenoid (vent)"
+                    android:textSize="20sp" />
+
+                <android.widget.Button
+                    android:id="@+id/controlSolenoidVentButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round"
+                    android:text="Control"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Proportion (Vent)"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/controlProportionVentDown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/round"
+                        android:text="Down"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/controlProportionVentUp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="UP"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/controlled1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/round"
+                        android:text="led1"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/controlled2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/round"
+                        android:text="led2"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/controlled3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="led3"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="30dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/switch1_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 1: OFF"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/switch2_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 2: OFF"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/switch3_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 3: OFF"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/switch4_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 4: OFF"
+                        android:textSize="20sp" />
+
+
+                    <TextView
+                        android:id="@+id/switch5_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 5: OFF"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/switch6_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 6: OFF"
+                        android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/switch7_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 7: OFF"
+                        android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/switch8_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@android:drawable/edit_text"
+                        android:text="Switch 8: OFF"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+    <android.widget.Button
+        android:id="@+id/exitButton"
+        android:layout_width="106dp"
+        android:layout_height="57dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/round"
+        android:text="EXIT"
+        android:textColor="#ffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

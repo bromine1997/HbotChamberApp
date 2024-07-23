@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFCCE7E8"
+    tools:context=".RunActivity">
+
+    <!-- Title TextView -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Profile Run"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- MPAndroidChart LineChart -->
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <!-- Elapsed Time Box -->
+    <TextView
+        android:id="@+id/elapsedTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:text="00:00:00"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lineChart" />
+
+    <!-- Chamber Status - Chamber Pressure -->
+    <TextView
+        android:id="@+id/chamberPressureLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="Chamber Pressure"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/elapsedTime"
+        app:layout_constraintWidth_percent="0.33" />
+
+    <TextView
+        android:id="@+id/chamberPressure"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="test ATA"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chamberPressureLabel"
+        app:layout_constraintWidth_percent="0.33" />
+
+    <!-- Set Point Pressure -->
+    <TextView
+        android:id="@+id/setPointLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="SetPoint"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@id/chamberPressureLabel"
+        app:layout_constraintTop_toBottomOf="@id/elapsedTime"
+        app:layout_constraintWidth_percent="0.33" />
+
+    <TextView
+        android:id="@+id/setPointPressure"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="test ATA"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@id/chamberPressure"
+        app:layout_constraintTop_toBottomOf="@id/setPointLabel"
+        app:layout_constraintWidth_percent="0.33" />
+
+    <!-- Flow Rate -->
+
+    <!-- Gas Analyzer and Note Buttons -->
+
+    <LinearLayout
+        android:id="@+id/statesBox"
+        android:layout_width="341dp"
+        android:layout_height="203dp"
+        android:layout_marginTop="8dp"
+        android:background="#FFB0E0E6"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chamberPressure"
+        app:layout_constraintWidth_percent="0.33">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="States"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/yellow_circle" />
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:text="DOOR LOCK"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+            <View
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/yellow_circle" />
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="37dp"
+                android:text="MANUAL"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center"
+                android:background="@drawable/yellow_circle" />
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:text="RUN"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+            <View
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/yellow_circle" />
+
+            <TextView
+                android:layout_width="113dp"
+                android:layout_height="31dp"
+                android:text="ALARM"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/yellow_circle" />
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:text="END"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+
+            <View
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center"
+                android:background="@drawable/yellow_circle" />
+
+            <TextView
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:text="COMPLETE"
+                android:textColor="#000000"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="135dp"
+        android:layout_height="203dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/statesBox"
+        app:layout_constraintTop_toBottomOf="@id/chamberPressure"
+        app:layout_constraintWidth_percent="0.33">
+
+        <Button
+            android:id="@+id/btnGasAnalyzer"
+            android:layout_width="121dp"
+            android:layout_height="66dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#1E90FF"
+            android:text="Gas Analyzer" />
+
+        <Button
+            android:id="@+id/btnNote"
+            android:layout_width="121dp"
+            android:layout_height="66dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#1E90FF"
+            android:text="Note" />
+    </LinearLayout>
+
+    <!-- Control Buttons - Run, Pause, End, Exit -->
+    <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/controlButtons"
+        android:layout_width="493dp"
+        android:layout_height="198dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.775"
+        app:layout_constraintStart_toEndOf="@id/statesBox"
+        app:layout_constraintTop_toBottomOf="@id/chamberPressure"
+        app:layout_constraintWidth_percent="0.34">
+
+        <Button
+            android:id="@+id/btnRun"
+            android:layout_width="121dp"
+            android:layout_height="66dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#1E90FF"
+            android:text="RUN"
+            app:layout_column="0"
+            app:layout_row="0" />
+
+        <Button
+            android:id="@+id/btnPause"
+            android:layout_width="121dp"
+            android:layout_height="66dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#1E90FF"
+            android:text="Pause"
+            app:layout_column="1"
+            app:layout_row="0" />
+
+        <Button
+            android:id="@+id/btnEnd"
+            android:layout_width="121dp"
+            android:layout_height="66dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#1E90FF"
+            android:text="END"
+            app:layout_column="0"
+            app:layout_row="1" />
+
+        <Button
+            android:id="@+id/btnExit"
+            android:layout_width="121dp"
+            android:layout_height="66dp"
+            android:layout_margin="8dp"
+            android:backgroundTint="#1E90FF"
+            android:text="EXIT"
+            app:layout_column="1"
+            app:layout_row="1" />
+    </androidx.gridlayout.widget.GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#30A2F3"/> <!-- 이곳에 원하는 색상을 설정하세요 -->
+    <corners android:radius="20dp"/> <!-- 모서리의 둥글기 정도를 설정하세요 -->
+    <padding
+        android:left="10dp"
+        android:top="10dp"
+        android:right="10dp"
+        android:bottom="10dp" />
+</shape>
