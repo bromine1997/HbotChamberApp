@@ -15,10 +15,7 @@ import com.mcsl.hbotchamberapp.Controller.PinController;
 public class ValveService extends Service {
     private static final String TAG = "GPIOService";
     private Handler handler;
-    private Runnable i2cRunnable;
     private Runnable valveRunnable;
-    private Runnable co2Runnable;
-
 
     private static final String ACTION_TOGGLE_PRESS = "com.mcsl.hbotchamberapp.action.TOGGLE_PRESS";
     private static final String ACTION_TOGGLE_VENT = "com.mcsl.hbotchamberapp.action.TOGGLE_VENT";

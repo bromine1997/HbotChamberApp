@@ -6,12 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.mcsl.hbotchamberapp.Sevice.GpioService;
+import com.mcsl.hbotchamberapp.Sevice.SensorService;
+import com.mcsl.hbotchamberapp.Sevice.ValveService;
 import com.mcsl.hbotchamberapp.databinding.ActivityMenuBinding;
 
 public class MenuActivity extends AppCompatActivity {
 
     private ActivityMenuBinding binding;
     private Intent GpioServiceIntent;
+
+    private Intent SensorServiceIntent;
+
+    private Intent ValveServiceIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +28,12 @@ public class MenuActivity extends AppCompatActivity {
         // GPIOService 시작
         GpioServiceIntent = new Intent(this, GpioService.class);
         startService(GpioServiceIntent);
+        // SensorService 시작
+        SensorServiceIntent = new Intent(this, SensorService.class);
+        startService(SensorServiceIntent);
+        // ValveService 시작
+        ValveServiceIntent = new Intent(this, ValveService.class);
+        startService(ValveServiceIntent);
 
         // 버튼 클릭 리스너 설정
         binding.runButton.setOnClickListener(new View.OnClickListener() {
@@ -56,6 +68,8 @@ public class MenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 앱 종료
                 stopService(GpioServiceIntent);
+                stopService(SensorServiceIntent);
+                stopService(ValveServiceIntent);
                 finish();
             }
         });
@@ -67,5 +81,7 @@ public class MenuActivity extends AppCompatActivity {
         super.onDestroy();
         // GPIOService 종료
         stopService(GpioServiceIntent);
+        stopService(SensorServiceIntent);
+        stopService(ValveServiceIntent);
     };
 }

@@ -46,7 +46,8 @@ public class SensorService extends Service {
             @Override
             public void run() {
                 readAndBroadcastAdcValues();
-                handler.postDelayed(this, 1000); // 1초마다 실행
+                Log.d(TAG, "run: adc 1");
+                handler.postDelayed(this, 100); // 1초마다 실행
             }
         };
 
@@ -54,7 +55,8 @@ public class SensorService extends Service {
             @Override
             public void run() {
                 readAndBroadcastCo2Values();
-                handler.postDelayed(this, 1000); // 2초마다 실행
+                Log.d(TAG, "run: adc 2");
+                handler.postDelayed(this, 100); // 2초마다 실행
             }
         };
 
@@ -69,6 +71,7 @@ public class SensorService extends Service {
         intent.putExtra("adcValues", adcValues);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
+
 
 
 
