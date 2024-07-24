@@ -29,7 +29,7 @@ public class IoPortActivity extends AppCompatActivity {
             int[] adcValues = intent.getIntArrayExtra("adcValues");
             if (adcValues != null) {
                 binding.o2Value.setText(adcValues[0] + " %");
-                binding.co2Value.setText(adcValues[1] + " %");
+                binding.co2Value.setText(adcValues[1] + " PPM");
                 binding.humidityValue.setText(adcValues[2] + " %");
                 binding.tempValue.setText(adcValues[3] + " °C");
                 binding.pressureValue.setText(adcValues[4] + " ATA");
@@ -56,19 +56,19 @@ public class IoPortActivity extends AppCompatActivity {
     private void initializeButtons() {
         binding.controlled1.setOnClickListener(v -> {
             Intent intent = new Intent(this, GpioService.class);
-            intent.setAction("com.example.test.action.TOGGLE_LED1");
+            intent.setAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED1");
             startService(intent);
         });
 
         binding.controlled2.setOnClickListener(v -> {
             Intent intent = new Intent(this, GpioService.class);
-            intent.setAction("com.example.test.action.TOGGLE_LED2");
+            intent.setAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED2");
             startService(intent);
         });
 
         binding.controlled3.setOnClickListener(v -> {
             Intent intent = new Intent(this, GpioService.class);
-            intent.setAction("com.example.test.action.TOGGLE_LED3");
+            intent.setAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED3");
             startService(intent);
         });
     }
