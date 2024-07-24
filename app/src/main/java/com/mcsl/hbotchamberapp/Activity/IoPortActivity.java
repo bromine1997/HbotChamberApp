@@ -1,8 +1,10 @@
-package com.mcsl.hbotchamberapp;
+package com.mcsl.hbotchamberapp.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.mcsl.hbotchamberapp.R;
 
 public class IoPortActivity extends AppCompatActivity {
 

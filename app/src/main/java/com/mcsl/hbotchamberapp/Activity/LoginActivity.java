@@ -1,4 +1,4 @@
-package com.mcsl.hbotchamberapp;
+package com.mcsl.hbotchamberapp.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;

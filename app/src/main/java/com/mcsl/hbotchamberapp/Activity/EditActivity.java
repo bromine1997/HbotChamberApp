@@ -1,5 +1,4 @@
-package com.mcsl.hbotchamberapp;
-
+package com.mcsl.hbotchamberapp.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -36,6 +35,8 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.widget.Toast;
+
+import com.mcsl.hbotchamberapp.R;
 import com.mcsl.hbotchamberapp.databinding.ActivityEditBinding;
 
 public class EditActivity extends AppCompatActivity {

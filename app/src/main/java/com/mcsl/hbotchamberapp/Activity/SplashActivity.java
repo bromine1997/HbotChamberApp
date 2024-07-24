@@ -1,10 +1,12 @@
-package com.mcsl.hbotchamberapp;
+package com.mcsl.hbotchamberapp.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.mcsl.hbotchamberapp.R;
 
 public class SplashActivity extends AppCompatActivity {
 
