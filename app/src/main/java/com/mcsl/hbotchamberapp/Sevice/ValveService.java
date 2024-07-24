@@ -39,9 +39,6 @@ public class ValveService extends Service {
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
 
-
-
-
         valveRunnable = new Runnable() {
             @Override
             public void run() {
