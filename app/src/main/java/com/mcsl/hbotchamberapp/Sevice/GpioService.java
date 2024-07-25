@@ -51,7 +51,7 @@ public class GpioService extends Service {
 
     private void readAndBroadcastI2cValues() {
         byte inputStatus = pinController.readInputs(); // 외부 입력 스위치 주기적으로 확인
-        Intent intent = new Intent("com.example.test.IO_STATUS_UPDATE");
+        Intent intent = new Intent("com.mcsl.hbotchamberapp.IO_STATUS_UPDATE");
         intent.putExtra("inputStatus", inputStatus);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -91,7 +91,7 @@ public class GpioService extends Service {
     }
 
     private void sendBroadcastUpdate(String status) {
-        Intent intent = new Intent("com.example.test.IO_STATUS_UPDATE");
+        Intent intent = new Intent("com.mcsl.hbotchamberapp.IO_STATUS_UPDATE");
         intent.putExtra("status", status);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

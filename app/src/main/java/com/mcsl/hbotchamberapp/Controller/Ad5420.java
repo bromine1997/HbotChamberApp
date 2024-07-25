@@ -82,7 +82,7 @@ public class Ad5420 {
         clear.write(0);
     }
 
-    void Daisy_reset(){
+    public void Daisy_reset(){
 
         byte[] command_reset = new byte[] {
                 AD5420_RESET_REG_ADDR, 0 , 1,
@@ -96,7 +96,7 @@ public class Ad5420 {
         latch1.write(1);
 
     }
-    void Daisy_Setup() {
+   public void Daisy_Setup() {
         // Example command to select channel and set configuration for MAX1032
         Log.d("subactivity_IOPORT", "ad5420 begin");
 
@@ -114,6 +114,7 @@ public class Ad5420 {
         };
 
         latch1.write(0);
+
         // 두 번째 칩을 업데이트할 때 48비트 전송
         spi1.write(command_setup);
 
@@ -129,8 +130,8 @@ public class Ad5420 {
     public void DaisyCurrentWrite(char Channel, short data) {                    //channel : press(0) or vent(1)     , data : 전류 크기
         byte[] Command_write;
 
-        byte command_Hdata = (byte) ((data >> 8) & 0xFF);
-        byte command_Ldata = (byte) (data & 0xFF);
+        byte command_Hdata = (byte) ((data >> 8) & 0xFF00);
+        byte command_Ldata = (byte) (data & 0x00FF);
 
         if (Channel == 0) {
             // 첫 번째 칩만 업데이트할 때 (24비트 전송)
@@ -176,7 +177,7 @@ public class Ad5420 {
 
 
     public void PressValveCurrentUp() {
-        pressCurrent += 256; // 0x0100
+        pressCurrent += 0x000F; // 0x0100
         if (pressCurrent > 0xFFFF) {
             pressCurrent = (short) 0xFFFF;
         }
@@ -185,7 +186,7 @@ public class Ad5420 {
     public void PressValveCurrentDown() {
 
         if (pressCurrent >= 256) {
-            pressCurrent -= 256;
+            pressCurrent -= 0x000F;
         } else {
             pressCurrent = 0;
         }

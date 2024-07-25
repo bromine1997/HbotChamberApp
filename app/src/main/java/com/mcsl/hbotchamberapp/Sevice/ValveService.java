@@ -17,6 +17,9 @@ public class ValveService extends Service {
     private Handler handler;
     private Runnable valveRunnable;
 
+    private static final String ACTION_TOGGLE_Sol_PRESS = "com.mcsl.hbotchamberapp.action.TOGGLE_SOL_PRESS";
+    private static final String ACTION_TOGGLE_Sol_VENT = "com.mcsl.hbotchamberapp.action.TOGGLE_SOL_VENT";
+
     private static final String ACTION_TOGGLE_PRESS = "com.mcsl.hbotchamberapp.action.TOGGLE_PRESS";
     private static final String ACTION_TOGGLE_VENT = "com.mcsl.hbotchamberapp.action.TOGGLE_VENT";
     private static final String ACTION_PRESS_VALVE_DOWN = "com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN";
@@ -33,6 +36,17 @@ public class ValveService extends Service {
         super.onCreate();
         pinController = new PinController();
         ad5420 = new Ad5420(0);
+
+
+
+        // Daisy_reset을 실행하고 1밀리초 지연 후 Daisy_Setup을 실행
+        ad5420.Daisy_reset();
+        try {
+            Thread.sleep(1); // 1밀리초 지연
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ad5420.Daisy_Setup();
 
 
         HandlerThread handlerThread = new HandlerThread("GPIOServiceBackgroundThread");
@@ -82,6 +96,15 @@ public class ValveService extends Service {
             String action = intent.getAction();
             if (action != null) {
                 switch (action) {
+                    case ACTION_TOGGLE_Sol_PRESS:
+                        pinController.toggleControlProportionPress();
+                        sendBroadcastUpdate("SOL_PRESS_TOGGLE");
+                        break;
+
+                    case ACTION_TOGGLE_Sol_VENT:
+                        pinController.toggleControlProportionVent();
+                        sendBroadcastUpdate("SOL_VENT_TOGGLE");
+
                     case ACTION_TOGGLE_PRESS:
                         pinController.toggleControlProportionPress();
                         sendBroadcastUpdate("PRESS");
@@ -121,7 +144,7 @@ public class ValveService extends Service {
     }
 
     private void sendBroadcastUpdate(String status) {
-        Intent intent = new Intent("com.example.test.IO_STATUS_UPDATE");
+        Intent intent = new Intent("com.mcsl.hbotchamberapp.IO_STATUS_UPDATE");
         intent.putExtra("status", status);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

@@ -10,10 +10,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.mcsl.hbotchamberapp.R;
+import com.mcsl.hbotchamberapp.Sevice.GpioService;
+import com.mcsl.hbotchamberapp.Sevice.ValveService;
 import com.mcsl.hbotchamberapp.Sevice.GpioService;
 import com.mcsl.hbotchamberapp.Sevice.ValveService;
 import com.mcsl.hbotchamberapp.databinding.ActivityIoportBinding;
@@ -29,11 +30,20 @@ public class IoPortActivity extends AppCompatActivity {
             int[] adcValues = intent.getIntArrayExtra("adcValues");
             if (adcValues != null) {
                 binding.o2Value.setText(adcValues[0] + " %");
-                binding.co2Value.setText(adcValues[1] + " PPM");
                 binding.humidityValue.setText(adcValues[2] + " %");
                 binding.tempValue.setText(adcValues[3] + " °C");
                 binding.pressureValue.setText(adcValues[4] + " ATA");
                 binding.flowValue.setText(adcValues[5] + " lpm");
+            }
+        }
+    };
+
+    private BroadcastReceiver co2ValuesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int co2Ppm = intent.getIntExtra("co2Ppm", -1);
+            if (co2Ppm != -1) {
+                binding.co2Value.setText(co2Ppm + " PPM");
             }
         }
     };
@@ -54,73 +64,36 @@ public class IoPortActivity extends AppCompatActivity {
     };
 
     private void initializeButtons() {
-        binding.controlled1.setOnClickListener(v -> {
-            Intent intent = new Intent(this, GpioService.class);
-            intent.setAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED1");
-            startService(intent);
-        });
-
-        binding.controlled2.setOnClickListener(v -> {
-            Intent intent = new Intent(this, GpioService.class);
-            intent.setAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED2");
-            startService(intent);
-        });
-
-        binding.controlled3.setOnClickListener(v -> {
-            Intent intent = new Intent(this, GpioService.class);
-            intent.setAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED3");
-            startService(intent);
-        });
+        binding.controlled1.setOnClickListener(v -> sendGpioServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED1"));
+        binding.controlled2.setOnClickListener(v -> sendGpioServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED2"));
+        binding.controlled3.setOnClickListener(v -> sendGpioServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_LED3"));
     }
 
     private void initializeValveButtons() {
-        binding.controlProportionPressButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.TOGGLE_PRESS");
-            startService(intent);
-        });
+        // 버튼마다 역할 수정 필요
+        binding.controlSolenoidPressButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_PRESS"));
 
-        binding.controlSolenoidPressButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.TOGGLE_PRESS");
-            startService(intent);
-        });
+        binding.controlProportionPressButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_PRESS"));
+        binding.controlProportionPressDown.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN"));
+        binding.controlProportionPressUP.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_UP"));
 
-        binding.controlProportionPressDown.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.PRESS_VALVE_DOWN");
-            startService(intent);
-        });
+        binding.controlProportionVentButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_VENT"));
 
-        binding.controlProportionPressUP.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.PRESS_VALVE_UP");
-            startService(intent);
-        });
+        binding.controlSolenoidVentButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_VENT"));
+        binding.controlProportionVentDown.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.VENT_VALVE_DOWN"));
+        binding.controlProportionVentUp.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.VENT_VALVE_UP"));
+    }
 
-        binding.controlSolenoidVentButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.TOGGLE_VENT");
-            startService(intent);
-        });
+    private void sendGpioServiceAction(String action) {
+        Intent intent = new Intent(this, GpioService.class);
+        intent.setAction(action);
+        startService(intent);
+    }
 
-        binding.controlProportionVentButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.TOGGLE_VENT");
-            startService(intent);
-        });
-
-        binding.controlProportionVentDown.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.VENT_VALVE_DOWN");
-            startService(intent);
-        });
-
-        binding.controlProportionVentUp.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ValveService.class);
-            intent.setAction("com.example.test.action.VENT_VALVE_UP");
-            startService(intent);
-        });
+    private void sendValveServiceAction(String action) {
+        Intent intent = new Intent(this, ValveService.class);
+        intent.setAction(action);
+        startService(intent);
     }
 
     private void updateTextViewStatus(byte inputStatus, TextView textView, int bit) {
@@ -131,8 +104,9 @@ public class IoPortActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(adcValuesReceiver, new IntentFilter("com.example.test.ADC_VALUES"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(ioStatusReceiver, new IntentFilter("com.example.test.IO_STATUS_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(adcValuesReceiver, new IntentFilter("com.mcsl.hbotchamberapp.ADC_VALUES"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(co2ValuesReceiver, new IntentFilter("com.mcsl.hbotchamberapp.CO2_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(ioStatusReceiver, new IntentFilter("com.mcsl.hbotchamberapp.IO_STATUS_UPDATE"));
     }
 
     @Override
@@ -148,6 +122,7 @@ public class IoPortActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(adcValuesReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(co2ValuesReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ioStatusReceiver);
     }
 }

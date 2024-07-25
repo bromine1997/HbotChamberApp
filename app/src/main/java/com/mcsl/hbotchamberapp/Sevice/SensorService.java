@@ -12,42 +12,42 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.mcsl.hbotchamberapp.Controller.Co2Sensor;
 import com.mcsl.hbotchamberapp.Controller.Max1032;
 
+import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SensorService extends Service {
     private static final String TAG = "SensorService";
     private Handler handler;
     private Runnable adcRunnable;
     private Runnable co2Runnable;
 
-
     private static final String ACTION_REQUEST_ADC_VALUES = "com.mcsl.hbotchamberapp.action.REQUEST_ADC_VALUES";
     private static final String ACTION_CO2_UPDATE = "com.mcsl.hbotchamberapp.action.CO2_UPDATE";
 
-
-    private Max1032 max1032;
+    private Max1032 multiSensor;
     private Co2Sensor co2sensor;
-
-
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        max1032 = new Max1032(1, 18); // SPI 1 bus => SPI5, LatchPin 설정
-        co2sensor = new Co2Sensor();                //baud rate 9600,
+        multiSensor = new Max1032(1, 18); // SPI 1 bus => SPI5, LatchPin 설정
+        multiSensor.ConfigAllChannels();
+
+        co2sensor = new Co2Sensor(); // baud rate 9600
+        co2sensor.init();
 
         HandlerThread handlerThread = new HandlerThread("MyServiceBackgroundThread");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
 
-
-        co2sensor.init();
-
         adcRunnable = new Runnable() {
             @Override
             public void run() {
                 readAndBroadcastAdcValues();
-                Log.d(TAG, "run: adc 1");
-                handler.postDelayed(this, 100); // 1초마다 실행
+                Log.d(TAG, "run: adc");
+                handler.postDelayed(this, 1000); // 1초마다 실행
             }
         };
 
@@ -55,41 +55,49 @@ public class SensorService extends Service {
             @Override
             public void run() {
                 readAndBroadcastCo2Values();
-                Log.d(TAG, "run: adc 2");
-                handler.postDelayed(this, 100); // 2초마다 실행
+                Log.d(TAG, "run: co2");
+                handler.postDelayed(this, 2000); // 2초마다 실행
             }
         };
 
-        // 처음 실행 (1초 후에 첫 실행)
-        handler.postDelayed(adcRunnable, 100);
-        handler.postDelayed(co2Runnable, 100);
+        handler.postDelayed(adcRunnable, 1000);
+        handler.postDelayed(co2Runnable, 2000);
     }
 
     private void readAndBroadcastAdcValues() {
-        int[] adcValues = max1032.readAllChannels();
-        Intent intent = new Intent("com.example.test.ADC_VALUES");
+        int[] adcValues = multiSensor.readAllChannels();
+        Intent intent = new Intent("com.mcsl.hbotchamberapp.ADC_VALUES");
         intent.putExtra("adcValues", adcValues);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-
-
-
-    private void controlValves() {
-        Log.d(TAG, "Valves PID Start ");
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Valves PID processing");
-            }
-        }, 1000);
-    }
-
     private void readAndBroadcastCo2Values() {
+        try {
+            Future<String> futureCo2Data = co2sensor.loopbackCommand("Q\r\n");
+            String co2Data = futureCo2Data.get(); // 결과를 기다림
+            int co2Ppm = parseCo2Value(co2Data);
 
-        co2sensor.loopbackCommand("Q\r\n"); // 문자열 데이터를 정수로 바꾸고 ppm으로 표시하는 함수 추가해야함..ing (미완성)
-
+            Intent intent = new Intent("com.mcsl.hbotchamberapp.CO2_UPDATE");
+            intent.putExtra("co2Ppm", co2Ppm);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "CO2 데이터 읽기 오류", e);
+        }
+    }
+    private int parseCo2Value(String co2Str) {
+        // 숫자 부분만 추출하여 정수로 변환하는 로직 구현
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(co2Str);
+        if (matcher.find()) {
+            try {
+                int rawValue = Integer.parseInt(matcher.group());
+                int scalingFactor = 100; // 예제 스케일링 팩터 값
+                return rawValue * scalingFactor;
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return -1; // 변환 실패 시 기본값 반환
     }
 
     @Override
@@ -118,11 +126,11 @@ public class SensorService extends Service {
         Log.d(TAG, "Sensor 서비스가 종료되었습니다.");
         handler.removeCallbacks(adcRunnable);
         handler.removeCallbacks(co2Runnable);
-        handler.getLooper().quit();  // HandlerThread 종료
+        handler.getLooper().quit(); // HandlerThread 종료
     }
 
     private void sendBroadcastUpdate(String status) {
-        Intent intent = new Intent("com.example.test.IO_STATUS_UPDATE");
+        Intent intent = new Intent("com.mcsl.hbotchamberapp.IO_STATUS_UPDATE");
         intent.putExtra("status", status);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
