@@ -39,14 +39,14 @@ public class GpioService extends Service {
             @Override
             public void run() {
                 readAndBroadcastI2cValues();
-                Log.d(TAG, "GPIO I2C values read and broadcasted");
-                handler.postDelayed(this, 500); // 0.5초마다 실행
+               // Log.d(TAG, "GPIO I2C values read and broadcasted");
+                handler.postDelayed(this, 100); // 0.5초마다 실행
             }
         };
 
         // 처음 실행
         handler.postDelayed(i2cRunnable, 100);
-        Log.d(TAG, "GpioService started");
+       // Log.d(TAG, "GpioService started");
     }
 
     private void readAndBroadcastI2cValues() {

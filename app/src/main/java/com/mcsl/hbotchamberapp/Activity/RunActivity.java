@@ -8,6 +8,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -55,16 +56,20 @@ public class RunActivity extends AppCompatActivity {
     private boolean isRunning = false;
 
     private Button btnPauseResume;
+    private boolean isGasAnalyzerDialogOpen = false; // 플래그 변수 추가
 
-    private BroadcastReceiver adcValuesReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver sensorValuesReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("com.example.test.ADC_VALUES".equals(intent.getAction())) {
-                int[] adcValues = intent.getIntArrayExtra("adcValues");
-                if (adcValues != null) {
-                    showGasAnalyzerDialog(adcValues);
-                    // 팝업창을 띄운 후 리시버를 등록 해제하여 한 번만 팝업이 뜨도록 함
-                    LocalBroadcastManager.getInstance(RunActivity.this).unregisterReceiver(this);
+            if (!isGasAnalyzerDialogOpen) { // 팝업 창이 열려있지 않을 때만 처리
+                if ("com.mcsl.hbotchamberapp.ADC_VALUES".equals(intent.getAction())) {
+                    int[] adcValues = intent.getIntArrayExtra("adcValues");
+                    if (adcValues != null) {
+                        showGasAnalyzerDialog(adcValues, -1); // CO2 값이 아직 없는 경우
+                    }
+                } else if ("com.mcsl.hbotchamberapp.CO2_UPDATE".equals(intent.getAction())) {
+                    int co2Ppm = intent.getIntExtra("co2Ppm", -1);
+                    showGasAnalyzerDialog(null, co2Ppm); // ADC 값이 없는 경우
                 }
             }
         }
@@ -127,8 +132,10 @@ public class RunActivity extends AppCompatActivity {
         binding.btnGasAnalyzer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LocalBroadcastManager.getInstance(RunActivity.this).registerReceiver(adcValuesReceiver,
-                        new IntentFilter("com.example.test.ADC_VALUES"));
+                LocalBroadcastManager.getInstance(RunActivity.this).registerReceiver(sensorValuesReceiver,
+                        new IntentFilter("com.mcsl.hbotchamberapp.ADC_VALUES"));
+                LocalBroadcastManager.getInstance(RunActivity.this).registerReceiver(sensorValuesReceiver,
+                        new IntentFilter("com.mcsl.hbotchamberapp.CO2_UPDATE"));
             }
         });
 
@@ -169,19 +176,31 @@ public class RunActivity extends AppCompatActivity {
         });
     }
 
-    private void showGasAnalyzerDialog(int[] adcValues) {
+    private void showGasAnalyzerDialog(int[] adcValues, int co2Ppm) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Gas Analyzer");
 
-        // adcValues를 문자열로 변환하여 표시
+        // adcValues와 co2Ppm을 문자열로 변환하여 표시
         StringBuilder message = new StringBuilder();
-        for (int value : adcValues) {
-            message.append("ADC Value: ").append(value).append("\n");
+        if (adcValues != null) {
+            for (int value : adcValues) {
+                message.append("ADC Value: ").append(value).append("\n");
+            }
+        }
+        if (co2Ppm != -1) {
+            message.append("CO2 Value: ").append(co2Ppm).append(" ppm\n");
         }
 
         builder.setMessage(message.toString());
-        builder.setPositiveButton("OK", null);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                LocalBroadcastManager.getInstance(RunActivity.this).unregisterReceiver(sensorValuesReceiver);
+                isGasAnalyzerDialogOpen = false; // 팝업 창이 닫히면 플래그 업데이트
+            }
+        });
         builder.show();
+        isGasAnalyzerDialogOpen = true; // 팝업 창이 열리면 플래그 업데이트
     }
 
     private List<String[]> loadProfileData() {
@@ -353,5 +372,10 @@ public class RunActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         binding = null;  // 뷰 바인딩 해제
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(sensorValuesReceiver);
+        } catch (IllegalArgumentException e) {
+            // 리시버가 등록되지 않은 상태에서 해제하려고 할 때의 예외 처리
+        }
     }
 }

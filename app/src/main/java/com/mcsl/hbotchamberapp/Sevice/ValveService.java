@@ -17,13 +17,25 @@ public class ValveService extends Service {
     private Handler handler;
     private Runnable valveRunnable;
 
-    private static final String ACTION_TOGGLE_Sol_PRESS = "com.mcsl.hbotchamberapp.action.TOGGLE_SOL_PRESS";
-    private static final String ACTION_TOGGLE_Sol_VENT = "com.mcsl.hbotchamberapp.action.TOGGLE_SOL_VENT";
 
-    private static final String ACTION_TOGGLE_PRESS = "com.mcsl.hbotchamberapp.action.TOGGLE_PRESS";
-    private static final String ACTION_TOGGLE_VENT = "com.mcsl.hbotchamberapp.action.TOGGLE_VENT";
+
+    private static final String ACTION_Sol_PRESS_ON = "com.mcsl.hbotchamberapp.action.SOL_PRESS_ON";
+    private static final String ACTION_Sol_PRESS_OFF = "com.mcsl.hbotchamberapp.action.SOL_PRESS_OFF";
+
+    private static final String ACTION_Sol_VENT_ON = "com.mcsl.hbotchamberapp.action.SOL_VENT_ON";
+    private static final String ACTION_Sol_VENT_OFF = "com.mcsl.hbotchamberapp.action.SOL_VENT_OFF";
+
+    private static final String ACTION_Proportional_PRESS_ON = "com.mcsl.hbotchamberapp.action.Proportional_PRESS_ON";
+    private static final String ACTION_Proportional_PRESS_OFF = "com.mcsl.hbotchamberapp.action.Proportional_PRESS_OFF";
+
+    private static final String ACTION_Proportional_VENT_ON = "com.mcsl.hbotchamberapp.action.Proportional_VENT_ON";
+    private static final String ACTION_Proportional_VENT_OFF = "com.mcsl.hbotchamberapp.action.Proportional_VENT_OFF";
+
+
+
     private static final String ACTION_PRESS_VALVE_DOWN = "com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN";
     private static final String ACTION_PRESS_VALVE_UP = "com.mcsl.hbotchamberapp.action.PRESS_VALVE_UP";
+
     private static final String ACTION_VENT_VALVE_DOWN = "com.mcsl.hbotchamberapp.action.VENT_VALVE_DOWN";
     private static final String ACTION_VENT_VALVE_UP = "com.mcsl.hbotchamberapp.action.VENT_VALVE_UP";
 
@@ -46,7 +58,9 @@ public class ValveService extends Service {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         ad5420.Daisy_Setup();
+
 
 
         HandlerThread handlerThread = new HandlerThread("GPIOServiceBackgroundThread");
@@ -96,37 +110,62 @@ public class ValveService extends Service {
             String action = intent.getAction();
             if (action != null) {
                 switch (action) {
-                    case ACTION_TOGGLE_Sol_PRESS:
-                        pinController.toggleControlProportionPress();
-                        sendBroadcastUpdate("SOL_PRESS_TOGGLE");
+                    case ACTION_Sol_PRESS_ON:
+                        pinController.Sol_OUPUT(0,1);
+                        sendBroadcastUpdate("SOL_PRESS_ON");
                         break;
 
-                    case ACTION_TOGGLE_Sol_VENT:
-                        pinController.toggleControlProportionVent();
-                        sendBroadcastUpdate("SOL_VENT_TOGGLE");
+                    case ACTION_Sol_PRESS_OFF:
+                        pinController.Sol_OUPUT(0 , 0);
+                        sendBroadcastUpdate("SOL_PRESS_OFF");
+                        break;
 
-                    case ACTION_TOGGLE_PRESS:
-                        pinController.toggleControlProportionPress();
+                    case ACTION_Sol_VENT_ON:
+                        pinController.Sol_OUPUT(1,1);
+                        sendBroadcastUpdate("SOL_VENT_ON");
+                        break;
+
+                    case ACTION_Sol_VENT_OFF:
+                        pinController.Sol_OUPUT(1,0);
+                        sendBroadcastUpdate("SOL_VENT_OFF");
+                        break;
+
+
+
+                    case ACTION_Proportional_PRESS_ON:
+                        pinController.Proportion_Press_ON();
                         sendBroadcastUpdate("PRESS");
                         break;
-                    case ACTION_TOGGLE_VENT:
-                        pinController.toggleControlProportionVent();
-                        sendBroadcastUpdate("VENT");
+                    case ACTION_Proportional_PRESS_OFF:
+                        pinController.Proportion_Press_OFF();
+                        sendBroadcastUpdate("PRESS");
                         break;
+
+                    case ACTION_Proportional_VENT_ON:
+                        pinController.Proportion_VENT_ON();
+                        sendBroadcastUpdate("PRESS");
+                        break;
+                    case ACTION_Proportional_VENT_OFF:
+                        pinController.Proportion_VENT_OFF();
+                        sendBroadcastUpdate("PRESS");
+                        break;
+
+
                     case ACTION_PRESS_VALVE_DOWN:
-                        ad5420.PressValveCurrentUp();
+                        ad5420.PressValveCurrentDown();
                         sendBroadcastUpdate("PRESS_VALVE_DOWN");
                         break;
                     case ACTION_PRESS_VALVE_UP:
-                        ad5420.PressValveCurrentDown();
+                        ad5420.PressValveCurrentUp();
                         sendBroadcastUpdate("PRESS_VALVE_UP");
                         break;
+
                     case ACTION_VENT_VALVE_DOWN:
-                        ad5420.VentValveCurrentUp();
+                        ad5420.VentValveCurrentDown();
                         sendBroadcastUpdate("VENT_VALVE_DOWN");
                         break;
                     case ACTION_VENT_VALVE_UP:
-                        ad5420.VentValveCurrentDown();
+                        ad5420.VentValveCurrentUp();
                         sendBroadcastUpdate("VENT_VALVE_UP");
                         break;
                 }

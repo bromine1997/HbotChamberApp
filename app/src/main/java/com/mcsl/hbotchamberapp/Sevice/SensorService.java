@@ -33,7 +33,7 @@ public class SensorService extends Service {
         super.onCreate();
 
         multiSensor = new Max1032(1, 18); // SPI 1 bus => SPI5, LatchPin 설정
-        multiSensor.ConfigAllChannels();
+        //multiSensor.ConfigAllChannels();
 
         co2sensor = new Co2Sensor(); // baud rate 9600
         co2sensor.init();
@@ -65,7 +65,7 @@ public class SensorService extends Service {
     }
 
     private void readAndBroadcastAdcValues() {
-        int[] adcValues = multiSensor.readAllChannels();
+        int[] adcValues = multiSensor.ReadAllChannels();
         Intent intent = new Intent("com.mcsl.hbotchamberapp.ADC_VALUES");
         intent.putExtra("adcValues", adcValues);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

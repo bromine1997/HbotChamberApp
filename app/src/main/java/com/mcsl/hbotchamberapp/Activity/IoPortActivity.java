@@ -1,5 +1,7 @@
 package com.mcsl.hbotchamberapp.Activity;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -10,6 +12,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.mcsl.hbotchamberapp.R;
@@ -70,19 +73,68 @@ public class IoPortActivity extends AppCompatActivity {
     }
 
     private void initializeValveButtons() {
-        // 버튼마다 역할 수정 필요
-        binding.controlSolenoidPressButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_PRESS"));
+        binding.controlSolPRESSON.setOnClickListener(v -> {
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_PRESS_ON");                  //솔레노이드 온
+        });
+        binding.controlSolPRESSOFF.setOnClickListener(v -> {
 
-        binding.controlProportionPressButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_PRESS"));
-        binding.controlProportionPressDown.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN"));
-        binding.controlProportionPressUP.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_UP"));
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_PRESS_OFF");                  //솔레노이드 오프
+        });
 
-        binding.controlProportionVentButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_VENT"));
 
-        binding.controlSolenoidVentButton.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.TOGGLE_VENT"));
-        binding.controlProportionVentDown.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.VENT_VALVE_DOWN"));
-        binding.controlProportionVentUp.setOnClickListener(v -> sendValveServiceAction("com.mcsl.hbotchamberapp.action.VENT_VALVE_UP"));
+        binding.ProportionalPRESSON.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_PRESS_ON");                     //비례제어 온오프
+        });
+        binding.ProportionalPRESSOFF.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_PRESS_OFF");                     //비례제어 온오프
+        });
+
+
+
+        binding.controlProportionPressDown.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN");
+        });
+
+        binding.controlProportionPressUP.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_UP");
+        });
+
+
+
+        binding.controlSolVENTON.setOnClickListener(v -> {
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_VENT_ON");
+        });
+
+        binding.controlSolVENTOFF.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_VENT_OFF");
+        });
+
+
+        binding.ProportionalVENTON.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_VENT_ON");
+        });
+        binding.ProportionalVENTOFF.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_VENT_OFF");
+        });
+
+        binding.controlProportionVentDown.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.VENT_VALVE_DOWN");
+        });
+
+        binding.controlProportionVentUp.setOnClickListener(v -> {
+
+            sendValveServiceAction("com.mcsl.hbotchamberapp.action.VENT_VALVE_UP");
+        });
     }
+
 
     private void sendGpioServiceAction(String action) {
         Intent intent = new Intent(this, GpioService.class);

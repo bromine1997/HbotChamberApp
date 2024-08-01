@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".IoPortActivity">
+    tools:context=".Activity.IoPortActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -162,36 +162,75 @@
                     android:textStyle="bold" />
 
                 <!-- Proportion (Press) -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Proportion (Press)"
-                    android:textSize="20sp" />
 
-                <android.widget.Button
-                    android:id="@+id/controlProportionPressButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/round"
-                    android:text="Control"
-                    android:textColor="#ffffff"
-                    android:textSize="16sp" />
 
                 <!-- Proportion (Press) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="solenoid (Press)"
+                    android:text="솔벨브(가압)"
                     android:textSize="20sp" />
 
-                <android.widget.Button
-                    android:id="@+id/controlSolenoidPressButton"
+                <!-- Proportion (Press) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/control_Sol_PRESS_ON"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/round"
+                        android:text="ON"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/control_Sol_PRESS_OFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="OFF"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/round"
-                    android:text="Control"
-                    android:textColor="#ffffff"
-                    android:textSize="16sp" />
+                    android:text="비례제어벨브(가압)"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/Proportional_PRESS_ON"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/round"
+                        android:text="ON"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/Proportional_PRESS_OFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="OFF"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -227,37 +266,73 @@
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Proportion (vent)"
-                    android:textSize="20sp" />
 
-                <android.widget.Button
-                    android:id="@+id/controlProportionVentButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/round"
-                    android:text="Control"
-                    android:textColor="#ffffff"
-                    android:textSize="16sp" />
 
 
                 <!-- Proportion (Press) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="solenoid (vent)"
+                    android:text="솔벨브(감압)"
                     android:textSize="20sp" />
 
-                <android.widget.Button
-                    android:id="@+id/controlSolenoidVentButton"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/control_Sol_VENT_ON"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/round"
+                        android:text="ON"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/control_Sol_VENT_OFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="OFF"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/round"
-                    android:text="Control"
-                    android:textColor="#ffffff"
-                    android:textSize="16sp" />
+                    android:text="비례제어벨브(감압)"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <android.widget.Button
+                        android:id="@+id/Proportional_VENT_ON"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/round"
+                        android:text="ON"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/Proportional_VENT_OFF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round"
+                        android:text="OFF"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
 
                 <TextView

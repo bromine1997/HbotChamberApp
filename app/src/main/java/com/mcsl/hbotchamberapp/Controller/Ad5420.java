@@ -32,22 +32,26 @@ public class Ad5420 {
     public static final byte AD5420_DATA_REG_ADDR = 0x01;     // Address of DAC DATA register
     public static final byte AD5420_RESET_REG_ADDR = 0x56;    // Address of DAC RESET register
 
+    private static final int DAC_VALUE_PER_MA = 4096; // 1mA당 DAC 값 (65535 / 16)
+
+    private short pressCurrent = 0;
+    private short ventCurrent = 0;
+
 
     private Spi spi1;
     private Gpio latch1;
     private Gpio clear;
 
-    private short pressCurrent = 0;
-    private short ventCurrent = 0;
+
 
     public Ad5420(int spiBus) {
-        spi1 = new Spi(spiBus);
+        spi1 = new Spi(0);
 
         latch1 = new Gpio(26);                  //AAD5420 2번째 소자 latch PIN
 
         clear = new Gpio(28);                   //CLEAR PIN 공통으로 사용
 
-        latch1.dir(Dir.DIR_OUT);
+
 
         clear.dir(Dir.DIR_OUT);
 
@@ -64,9 +68,9 @@ public class Ad5420 {
 
     private void clearSpiBuffer() {
         byte[] dummy = new byte[] {0, 0, 0, 0, 0, 0}; // 올바르게 배열을 초기화
-        latch1.write(0);
+
         spi1.write(dummy);
-        latch1.write(1);
+
     }
 
     void Daisyclear(){
@@ -89,11 +93,11 @@ public class Ad5420 {
                 AD5420_RESET_REG_ADDR, 0 , 1
         };
 
-        latch1.write(0);
+
         // 두 번째 칩을 업데이트할 때 48비트 전송
         spi1.write(command_reset);
 
-        latch1.write(1);
+
 
     }
    public void Daisy_Setup() {
@@ -104,23 +108,32 @@ public class Ad5420 {
 
         short config = (AD5420_REXT | AD5420_OUTEN | AD5420_DCEN | AD5420_4_20_RANGE);
 
-        byte configHigh = (byte) ((config >> 8) & 0xFF);
+        byte configHigh = (byte) ((config >> 8) & 0x00FF);
         byte configLow  = (byte) (config & 0xFF);
 
 
-        byte[] command_setup = new byte[] {
-                AD5420_CONTROL_REG_ADDR, configHigh , configLow,
+        byte[] command_setup_1 = new byte[] {
+                0,0,0,
                 AD5420_CONTROL_REG_ADDR, configHigh , configLow
         };
 
-        latch1.write(0);
+       byte[] command_setup = new byte[] {
+
+               AD5420_CONTROL_REG_ADDR, configHigh , configLow,
+               AD5420_CONTROL_REG_ADDR, configHigh , configLow
+       };
+
+       spi1.write(command_setup_1);
 
         // 두 번째 칩을 업데이트할 때 48비트 전송
-        spi1.write(command_setup);
 
-        latch1.write(1);
+       spi1.write(command_setup);
+
+       //
+
 
         try { Thread.sleep(1); } catch (InterruptedException e) {}
+
 
 
     }
@@ -130,12 +143,12 @@ public class Ad5420 {
     public void DaisyCurrentWrite(char Channel, short data) {                    //channel : press(0) or vent(1)     , data : 전류 크기
         byte[] Command_write;
 
-        byte command_Hdata = (byte) ((data >> 8) & 0xFF00);
-        byte command_Ldata = (byte) (data & 0x00FF);
+        byte command_Hdata = (byte) ((data >> 8) & 0x00FF);
+        byte command_Ldata = (byte) (data & 0xFF);
 
         if (Channel == 0) {
             // 첫 번째 칩만 업데이트할 때 (24비트 전송)
-            Command_write = new byte[] {AD5420_DATA_REG_ADDR, command_Hdata, command_Ldata};
+            Command_write = new byte[] {0,0,0,AD5420_DATA_REG_ADDR, command_Hdata, command_Ldata};
 
             // SPI로 데이터 전송
             spi1.write(Command_write);  // SPI 전송 후 자동으로 Latch가 내려감
@@ -143,11 +156,9 @@ public class Ad5420 {
         } else if (Channel == 1) {
             // 두 번째 칩을 업데이트할 때 (48비트 전송)
             Command_write = new byte[] {AD5420_DATA_REG_ADDR, command_Hdata, command_Ldata, 0, 0, 0};
-            latch1.write(0);
+
             // SPI로 데이터 전송
             spi1.write(Command_write);  // SPI 전송 후 자동으로 Latch가 내려감
-
-            latch1.write(1);
 
         } else {
             // 올바르지 않은 채널 번호일 때 (예외 처리)
@@ -177,23 +188,24 @@ public class Ad5420 {
 
 
     public void PressValveCurrentUp() {
-        pressCurrent += 0x000F; // 0x0100
+        pressCurrent += DAC_VALUE_PER_MA;
         if (pressCurrent > 0xFFFF) {
             pressCurrent = (short) 0xFFFF;
         }
         DaisyCurrentWrite((char) 0, pressCurrent);
     }
-    public void PressValveCurrentDown() {
 
-        if (pressCurrent >= 256) {
-            pressCurrent -= 0x000F;
+    public void PressValveCurrentDown() {
+        if (pressCurrent >= DAC_VALUE_PER_MA) {
+            pressCurrent -= DAC_VALUE_PER_MA;
         } else {
             pressCurrent = 0;
         }
         DaisyCurrentWrite((char) 0, pressCurrent);
     }
+
     public void VentValveCurrentUp() {
-        ventCurrent += 256; // 0x0100
+        ventCurrent += DAC_VALUE_PER_MA;
         if (ventCurrent > 0xFFFF) {
             ventCurrent = (short) 0xFFFF;
         }
@@ -201,8 +213,8 @@ public class Ad5420 {
     }
 
     public void VentValveCurrentDown() {
-        if (ventCurrent >= 256) {
-            ventCurrent -= 256;
+        if (ventCurrent >= DAC_VALUE_PER_MA) {
+            ventCurrent -= DAC_VALUE_PER_MA;
         } else {
             ventCurrent = 0;
         }
