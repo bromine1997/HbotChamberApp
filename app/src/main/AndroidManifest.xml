@@ -13,9 +13,13 @@
         android:theme="@style/Theme.HBOTChamber"
         tools:targetApi="31">
         <service
-            android:name=".Sevice.GpioService"
+            android:name=".Sevice.PidService"
             android:enabled="true"
             android:exported="true"></service>
+        <service
+            android:name=".Sevice.GpioService"
+            android:enabled="true"
+            android:exported="true" />
         <service
             android:name=".Sevice.ValveService"
             android:enabled="true"
@@ -24,7 +28,6 @@
             android:name=".Sevice.SensorService"
             android:enabled="true"
             android:exported="true" />
-
 
         <activity
             android:name=".Activity.SplashActivity"

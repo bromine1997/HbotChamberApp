@@ -47,7 +47,7 @@ public class SensorService extends Service {
             public void run() {
                 readAndBroadcastAdcValues();
                 Log.d(TAG, "run: adc");
-                handler.postDelayed(this, 1000); // 1초마다 실행
+                handler.postDelayed(this, 100); // 1초마다 실행
             }
         };
 
@@ -56,7 +56,7 @@ public class SensorService extends Service {
             public void run() {
                 readAndBroadcastCo2Values();
                 Log.d(TAG, "run: co2");
-                handler.postDelayed(this, 2000); // 2초마다 실행
+                handler.postDelayed(this, 100); // 2초마다 실행
             }
         };
 
@@ -65,9 +65,15 @@ public class SensorService extends Service {
     }
 
     private void readAndBroadcastAdcValues() {
-        int[] adcValues = multiSensor.ReadAllChannels();
+        int[] adcValues = multiSensor.ReadAllChannels(); // 0번:습도, 1번:온도 , 2번:유량, 3번:압력 , 4번: 산소, 5번 : 연결안됨
         Intent intent = new Intent("com.mcsl.hbotchamberapp.ADC_VALUES");
         intent.putExtra("adcValues", adcValues);
+
+        // 압력 값만 별도로 브로드캐스트
+        Intent pressureIntent = new Intent("com.mcsl.hbotchamberapp.PRESSURE_UPDATE");
+        pressureIntent.putExtra("pressure", adcValues[3]);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(pressureIntent);
+
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
