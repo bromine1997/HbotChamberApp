@@ -25,14 +25,11 @@ public class PidService extends Service {
     private double setPoint;
     private double currentPressure;
 
-
-
-    // broadcastReceiver를 통해 특정 인텐드를 수신하여 압력값을 추출해서 PIDservice에 사용하는 Pressure 변수에 저장
     private BroadcastReceiver pressureReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ("com.mcsl.hbotchamberapp.PRESSURE_UPDATE".equals(intent.getAction())) {
-                currentPressure = intent.getDoubleExtra("pressure", 0.0);
+                currentPressure = intent.getIntExtra("pressure", 0);
                 Log.d(TAG, "Received pressure: " + currentPressure);
             }
         }

@@ -1,7 +1,10 @@
 package com.mcsl.hbotchamberapp.Sevice;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -17,8 +20,6 @@ public class ValveService extends Service {
     private Handler handler;
     private Runnable valveRunnable;
 
-
-
     private static final String ACTION_Sol_PRESS_ON = "com.mcsl.hbotchamberapp.action.SOL_PRESS_ON";
     private static final String ACTION_Sol_PRESS_OFF = "com.mcsl.hbotchamberapp.action.SOL_PRESS_OFF";
 
@@ -31,8 +32,6 @@ public class ValveService extends Service {
     private static final String ACTION_Proportional_VENT_ON = "com.mcsl.hbotchamberapp.action.Proportional_VENT_ON";
     private static final String ACTION_Proportional_VENT_OFF = "com.mcsl.hbotchamberapp.action.Proportional_VENT_OFF";
 
-
-
     private static final String ACTION_PRESS_VALVE_DOWN = "com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN";
     private static final String ACTION_PRESS_VALVE_UP = "com.mcsl.hbotchamberapp.action.PRESS_VALVE_UP";
 
@@ -42,14 +41,23 @@ public class ValveService extends Service {
     private PinController pinController;
     private Ad5420 ad5420;
 
+    private BroadcastReceiver pidOutputReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("com.mcsl.hbotchamberapp.PID_OUTPUT_UPDATE".equals(intent.getAction())) {
+                double pidOutput = intent.getDoubleExtra("pidOutput", 0.0);
+                Log.d(TAG, "Received PID output: " + pidOutput);
+                // PID 출력 값을 이용해 비례제어 밸브를 제어하는 로직을 추가
+                controlProportionalValve(pidOutput);
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
         super.onCreate();
         pinController = new PinController();
         ad5420 = new Ad5420(0);
-
-
 
         // Daisy_reset을 실행하고 1밀리초 지연 후 Daisy_Setup을 실행
         ad5420.Daisy_reset();
@@ -58,10 +66,7 @@ public class ValveService extends Service {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         ad5420.Daisy_Setup();
-
-
 
         HandlerThread handlerThread = new HandlerThread("GPIOServiceBackgroundThread");
         handlerThread.start();
@@ -70,28 +75,27 @@ public class ValveService extends Service {
         valveRunnable = new Runnable() {
             @Override
             public void run() {
-                // PID 제어를 포함한 벨브 제어 로직을 추가
-                controlValves();  // PID제어 함수로 변경
+                controlValves();
                 handler.postDelayed(this, 1000); // 1초마다 실행
             }
         };
 
-
-        // 처음 실행
         handler.postDelayed(valveRunnable, 1000);
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(pidOutputReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.PID_OUTPUT_UPDATE"));
     }
 
-    private void readAndBroadcastI2cValues() {
-        byte inputStatus = pinController.readInputs();              //외부 입력 스위치 주기적으로 확인
-        Intent intent = new Intent("com.example.test.IO_STATUS_UPDATE");
-        intent.putExtra("inputStatus", inputStatus);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    private void controlProportionalValve(double pidOutput) {
+        // PID 출력 값을 4~20mA 신호로 변환하여 비례제어 밸브를 제어하는 로직
+        // 예: pidOutput 값을 4~20mA 범위로 변환하여 ad5420에 설정
+        double mAValue = 4.0 + (16.0 * (pidOutput / 100.0)); // 예제 변환 (0~100%를 4~20mA로)
+        ad5420.DaisyCurrentWrite((char) 0, (short) mAValue);
+        Log.d(TAG, "Proportional valve set to: " + mAValue + "mA");
     }
 
     private void controlValves() {
-        Log.d(TAG, "Valves PID Start ");
-
+        Log.d(TAG, "Valves PID Start");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -99,8 +103,6 @@ public class ValveService extends Service {
             }
         }, 1000);
     }
-
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -111,26 +113,24 @@ public class ValveService extends Service {
             if (action != null) {
                 switch (action) {
                     case ACTION_Sol_PRESS_ON:
-                        pinController.Sol_OUPUT(0,1);
+                        pinController.Sol_OUPUT(0, 1);
                         sendBroadcastUpdate("SOL_PRESS_ON");
                         break;
 
                     case ACTION_Sol_PRESS_OFF:
-                        pinController.Sol_OUPUT(0 , 0);
+                        pinController.Sol_OUPUT(0, 0);
                         sendBroadcastUpdate("SOL_PRESS_OFF");
                         break;
 
                     case ACTION_Sol_VENT_ON:
-                        pinController.Sol_OUPUT(1,1);
+                        pinController.Sol_OUPUT(1, 1);
                         sendBroadcastUpdate("SOL_VENT_ON");
                         break;
 
                     case ACTION_Sol_VENT_OFF:
-                        pinController.Sol_OUPUT(1,0);
+                        pinController.Sol_OUPUT(1, 0);
                         sendBroadcastUpdate("SOL_VENT_OFF");
                         break;
-
-
 
                     case ACTION_Proportional_PRESS_ON:
                         pinController.Proportion_Press_ON();
@@ -149,7 +149,6 @@ public class ValveService extends Service {
                         pinController.Proportion_VENT_OFF();
                         sendBroadcastUpdate("PRESS");
                         break;
-
 
                     case ACTION_PRESS_VALVE_DOWN:
                         ad5420.PressValveCurrentDown();
@@ -179,7 +178,8 @@ public class ValveService extends Service {
         super.onDestroy();
         Log.d(TAG, "Valve 서비스가 종료되었습니다.");
         handler.removeCallbacks(valveRunnable);
-        handler.getLooper().quit();  // HandlerThread 종료
+        handler.getLooper().quit(); // HandlerThread 종료
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pidOutputReceiver);
     }
 
     private void sendBroadcastUpdate(String status) {

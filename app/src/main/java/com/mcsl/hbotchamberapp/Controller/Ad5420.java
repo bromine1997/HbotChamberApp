@@ -34,8 +34,11 @@ public class Ad5420 {
 
     private static final int DAC_VALUE_PER_MA = 4096; // 1mA당 DAC 값 (65535 / 16)
 
-    private short pressCurrent = 0;
-    private short ventCurrent = 0;
+    private int pressCurrent = 0; // 변경: short -> int
+    private int ventCurrent = 0; // 변경: short -> int
+
+    private static final int DAC_MAX_VALUE = 0xFFFF; // 16비트 최대값
+
 
 
     private Spi spi1;
@@ -189,10 +192,11 @@ public class Ad5420 {
 
     public void PressValveCurrentUp() {
         pressCurrent += DAC_VALUE_PER_MA;
-        if (pressCurrent > 0xFFFF) {
-            pressCurrent = (short) 0xFFFF;
+        if (pressCurrent > DAC_MAX_VALUE) {
+            pressCurrent = DAC_MAX_VALUE;
         }
-        DaisyCurrentWrite((char) 0, pressCurrent);
+        Log.d("CurrentValue", "Press Valve Current: " + pressCurrent);
+        DaisyCurrentWrite((char) 0, (short)pressCurrent);
     }
 
     public void PressValveCurrentDown() {
@@ -201,15 +205,15 @@ public class Ad5420 {
         } else {
             pressCurrent = 0;
         }
-        DaisyCurrentWrite((char) 0, pressCurrent);
+        DaisyCurrentWrite((char) 0, (short)pressCurrent);
     }
 
     public void VentValveCurrentUp() {
         ventCurrent += DAC_VALUE_PER_MA;
-        if (ventCurrent > 0xFFFF) {
-            ventCurrent = (short) 0xFFFF;
+        if (ventCurrent > DAC_MAX_VALUE) {
+            ventCurrent = DAC_MAX_VALUE;
         }
-        DaisyCurrentWrite((char) 1, ventCurrent);
+        DaisyCurrentWrite((char) 1, (short)ventCurrent);
     }
 
     public void VentValveCurrentDown() {
@@ -218,7 +222,7 @@ public class Ad5420 {
         } else {
             ventCurrent = 0;
         }
-        DaisyCurrentWrite((char) 1, ventCurrent);
+        DaisyCurrentWrite((char) 1,(short) ventCurrent);
     }
 
 }

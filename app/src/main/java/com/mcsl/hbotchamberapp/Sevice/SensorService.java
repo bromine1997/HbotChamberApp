@@ -28,6 +28,10 @@ public class SensorService extends Service {
     private Max1032 multiSensor;
     private Co2Sensor co2sensor;
 
+    private Intent adcIntent;
+    private Intent pressureIntent;
+    private Intent co2Intent;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,6 +41,10 @@ public class SensorService extends Service {
 
         co2sensor = new Co2Sensor(); // baud rate 9600
         co2sensor.init();
+
+        adcIntent = new Intent("com.mcsl.hbotchamberapp.ADC_VALUES");
+        pressureIntent = new Intent("com.mcsl.hbotchamberapp.PRESSURE_UPDATE");
+        co2Intent = new Intent("com.mcsl.hbotchamberapp.CO2_UPDATE");
 
         HandlerThread handlerThread = new HandlerThread("MyServiceBackgroundThread");
         handlerThread.start();
@@ -59,22 +67,20 @@ public class SensorService extends Service {
                 handler.postDelayed(this, 100); // 2초마다 실행
             }
         };
-
+        Log.d(TAG, "TTTTTTTTTTTTTTTTTTTes");
         handler.postDelayed(adcRunnable, 1000);
-        handler.postDelayed(co2Runnable, 2000);
+        handler.postDelayed(co2Runnable, 1000);
     }
 
     private void readAndBroadcastAdcValues() {
-        int[] adcValues = multiSensor.ReadAllChannels(); // 0번:습도, 1번:온도 , 2번:유량, 3번:압력 , 4번: 산소, 5번 : 연결안됨
-        Intent intent = new Intent("com.mcsl.hbotchamberapp.ADC_VALUES");
-        intent.putExtra("adcValues", adcValues);
+        int[] adcValues = multiSensor.ReadAllChannels(); // 0번 습도, 1번 온도 , 2번 : 유량 3번:압력 , 4번: 산소, 5번 : 연결안됨
+        adcIntent.putExtra("adcValues", adcValues);
 
         // 압력 값만 별도로 브로드캐스트
-        Intent pressureIntent = new Intent("com.mcsl.hbotchamberapp.PRESSURE_UPDATE");
         pressureIntent.putExtra("pressure", adcValues[3]);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(pressureIntent);
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(adcIntent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(pressureIntent);
     }
 
     private void readAndBroadcastCo2Values() {
@@ -83,13 +89,13 @@ public class SensorService extends Service {
             String co2Data = futureCo2Data.get(); // 결과를 기다림
             int co2Ppm = parseCo2Value(co2Data);
 
-            Intent intent = new Intent("com.mcsl.hbotchamberapp.CO2_UPDATE");
-            intent.putExtra("co2Ppm", co2Ppm);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            co2Intent.putExtra("co2Ppm", co2Ppm);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(co2Intent);
         } catch (Exception e) {
             Log.e(TAG, "CO2 데이터 읽기 오류", e);
         }
     }
+
     private int parseCo2Value(String co2Str) {
         // 숫자 부분만 추출하여 정수로 변환하는 로직 구현
         Pattern pattern = Pattern.compile("\\d+");

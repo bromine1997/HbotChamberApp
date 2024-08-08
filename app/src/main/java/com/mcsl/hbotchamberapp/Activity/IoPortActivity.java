@@ -18,8 +18,6 @@ import android.widget.TextView;
 import com.mcsl.hbotchamberapp.R;
 import com.mcsl.hbotchamberapp.Sevice.GpioService;
 import com.mcsl.hbotchamberapp.Sevice.ValveService;
-import com.mcsl.hbotchamberapp.Sevice.GpioService;
-import com.mcsl.hbotchamberapp.Sevice.ValveService;
 import com.mcsl.hbotchamberapp.databinding.ActivityIoportBinding;
 
 public class IoPortActivity extends AppCompatActivity {
