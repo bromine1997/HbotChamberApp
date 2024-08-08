@@ -37,7 +37,7 @@ public class SensorService extends Service {
         super.onCreate();
 
         multiSensor = new Max1032(1, 18); // SPI 1 bus => SPI5, LatchPin 설정
-        //multiSensor.ConfigAllChannels();
+        multiSensor.ConfigAllChannels();
 
         co2sensor = new Co2Sensor(); // baud rate 9600
         co2sensor.init();
@@ -74,6 +74,11 @@ public class SensorService extends Service {
 
     private void readAndBroadcastAdcValues() {
         int[] adcValues = multiSensor.ReadAllChannels(); // 0번 습도, 1번 온도 , 2번 : 유량 3번:압력 , 4번: 산소, 5번 : 연결안됨
+        adcValues[4] = calibrateOxygenValue(adcValues[4]); // 산소 값 캘리브레이션
+        adcValues[3] = (int) (calibratePressureValue(adcValues[3]) * 100); // 압력 값을 두 자리 소수점으로 변환 후 int로 변환
+
+
+
         adcIntent.putExtra("adcValues", adcValues);
 
         // 압력 값만 별도로 브로드캐스트
@@ -94,6 +99,19 @@ public class SensorService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "CO2 데이터 읽기 오류", e);
         }
+    }
+    private double calibratePressureValue(int rawPressureValue) {
+        // rawPressureValue를 압력 값으로 변환하는 로직
+        // 4mA -> 2675 ADC 값, 20mA -> 13305 ADC 값이라고 가정
+        double pressure = (double) (rawPressureValue - 2675) * (10 - 1) / (13305 - 2675) + 1;
+        return pressure; // 압력 값을 double로 반환
+    }
+
+    private int calibrateOxygenValue(int rawOxygenValue) {
+        int a0 = 46; // 초기 값 설정 (예: 센서의 공장 초기화 값)
+        int a1 = 10602; // 공기 중 측정 값 (예: 센서의 공기 중 초기화 값)
+        int calibratedValue = (rawOxygenValue - a0) * 2090 / (a1 - a0); // 산소 농도 % 계산 (0.1% 단위)
+        return calibratedValue;
     }
 
     private int parseCo2Value(String co2Str) {

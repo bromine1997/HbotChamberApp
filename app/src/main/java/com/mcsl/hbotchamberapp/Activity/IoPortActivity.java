@@ -30,11 +30,11 @@ public class IoPortActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             int[] adcValues = intent.getIntArrayExtra("adcValues");
             if (adcValues != null) {
-                binding.o2Value.setText(adcValues[0] + " %");
-                binding.humidityValue.setText(adcValues[2] + " %");
-                binding.tempValue.setText(adcValues[3] + " °C");
-                binding.pressureValue.setText(adcValues[4] + " ATA");
-                binding.flowValue.setText(adcValues[5] + " lpm");
+                binding.humidityValue.setText(adcValues[0] + " %");
+                binding.tempValue.setText(adcValues[1] + " °C");
+                binding.flowValue.setText(adcValues[2] + " lpm");
+                binding.pressureValue.setText(String.format("%.2f ATA", adcValues[3] / 100.0));
+                binding.o2Value.setText(String.format("%.2f %%", adcValues[4] / 100.0));
             }
         }
     };

@@ -26,7 +26,7 @@ public class Max1032 {
 
     //MAX1032 레지스터  설정값
     private static final char MAX1032_START = 0x80; // max1032 start bit
-    private static final char MAX1032_single_mode = 0x08; // 포트 B 데이터 레지스터
+    private static final char MAX1032_single_mode = 0x00; //
     private static final char MAX1032_RangeSelect_0 = 0x00; //
     private static final char MAX1032_RangeSelect_1 = 0x01; //
     private static final char MAX1032_RangeSelect_2 = 0x02; //
@@ -97,7 +97,7 @@ public class Max1032 {
         //int adcValue = ((responseBytes[2] & 0xFF) << 8) | (responseBytes[3] & 0xFF); // 상위 바이트와 하위 바이트 결합
 
 
-        return ((responseBytes[2] & 0xFF) << 8) | (responseBytes[3] & 0xFF); // 상위 바이트와 하위 바이트 결합
+        return ((responseBytes[2] & 0xFF) << 6) | ((responseBytes[3] & 0xFC) >> 2); // 상위 바이트와 하위 바이트 결합
 
     }
 
