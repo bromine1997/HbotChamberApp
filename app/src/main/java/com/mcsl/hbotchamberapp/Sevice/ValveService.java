@@ -75,7 +75,7 @@ public class ValveService extends Service {
         valveRunnable = new Runnable() {
             @Override
             public void run() {
-                controlValves();
+                //controlValves();
                 handler.postDelayed(this, 1000); // 1초마다 실행
             }
         };
@@ -134,20 +134,20 @@ public class ValveService extends Service {
 
                     case ACTION_Proportional_PRESS_ON:
                         pinController.Proportion_Press_ON();
-                        sendBroadcastUpdate("PRESS");
+                        sendBroadcastUpdate("PRESS_ON");
                         break;
                     case ACTION_Proportional_PRESS_OFF:
                         pinController.Proportion_Press_OFF();
-                        sendBroadcastUpdate("PRESS");
+                        sendBroadcastUpdate("PRESS_OFF");
                         break;
 
                     case ACTION_Proportional_VENT_ON:
                         pinController.Proportion_VENT_ON();
-                        sendBroadcastUpdate("PRESS");
+                        sendBroadcastUpdate("VENT_ON");
                         break;
                     case ACTION_Proportional_VENT_OFF:
                         pinController.Proportion_VENT_OFF();
-                        sendBroadcastUpdate("PRESS");
+                        sendBroadcastUpdate("VENT_OFF");
                         break;
 
                     case ACTION_PRESS_VALVE_DOWN:

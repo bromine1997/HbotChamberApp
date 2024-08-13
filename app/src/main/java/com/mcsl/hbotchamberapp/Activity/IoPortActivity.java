@@ -25,16 +25,53 @@ public class IoPortActivity extends AppCompatActivity {
     private Handler handler = new Handler(Looper.getMainLooper());
     private ActivityIoportBinding binding;
 
-    private BroadcastReceiver adcValuesReceiver = new BroadcastReceiver() {
+    // 각 센서 데이터를 받기 위한 브로드캐스트 리시버들
+    private BroadcastReceiver tempReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int[] adcValues = intent.getIntArrayExtra("adcValues");
-            if (adcValues != null) {
-                binding.humidityValue.setText(adcValues[0] + " %");
-                binding.tempValue.setText(adcValues[1] + " °C");
-                binding.flowValue.setText(adcValues[2] + " lpm");
-                binding.pressureValue.setText(String.format("%.2f ATA", adcValues[3] / 100.0));
-                binding.o2Value.setText(String.format("%.2f %%", adcValues[4] / 100.0));
+            double temperature = intent.getDoubleExtra("temperature", -1);
+            if (temperature != -1) {
+                binding.tempValue.setText(temperature + " °C");
+            }
+        }
+    };
+
+    private BroadcastReceiver humidityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            double humidity = intent.getDoubleExtra("humidity", -1);
+            if (humidity != -1) {
+                binding.humidityValue.setText(humidity + " %");
+            }
+        }
+    };
+
+    private BroadcastReceiver flowReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            double flowRate = intent.getDoubleExtra("flowRate", -1);
+            if (flowRate != -1) {
+                binding.flowValue.setText(flowRate + " lpm");
+            }
+        }
+    };
+
+    private BroadcastReceiver pressureReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            double pressure = intent.getDoubleExtra("pressure", -1);
+            if (pressure != -1) {
+                binding.pressureValue.setText(pressure + "ATA");
+            }
+        }
+    };
+
+    private BroadcastReceiver o2Receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            double oxygen = intent.getDoubleExtra("oxygen", -1);
+            if (oxygen != -1) {
+                binding.o2Value.setText(oxygen + " %");
             }
         }
     };
@@ -154,7 +191,11 @@ public class IoPortActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(adcValuesReceiver, new IntentFilter("com.mcsl.hbotchamberapp.ADC_VALUES"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(tempReceiver, new IntentFilter("com.mcsl.hbotchamberapp.Temp_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(humidityReceiver, new IntentFilter("com.mcsl.hbotchamberapp.Humidity_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(flowReceiver, new IntentFilter("com.mcsl.hbotchamberapp.Flow_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(pressureReceiver, new IntentFilter("com.mcsl.hbotchamberapp.PRESSURE_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(o2Receiver, new IntentFilter("com.mcsl.hbotchamberapp.O2_UPDATE"));
         LocalBroadcastManager.getInstance(this).registerReceiver(co2ValuesReceiver, new IntentFilter("com.mcsl.hbotchamberapp.CO2_UPDATE"));
         LocalBroadcastManager.getInstance(this).registerReceiver(ioStatusReceiver, new IntentFilter("com.mcsl.hbotchamberapp.IO_STATUS_UPDATE"));
     }
@@ -171,7 +212,11 @@ public class IoPortActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(adcValuesReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(tempReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(humidityReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(flowReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pressureReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(o2Receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(co2ValuesReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ioStatusReceiver);
     }
