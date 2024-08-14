@@ -9,7 +9,7 @@ import mraa.mraa;
 
 public class PinController {
 
-    private static final int LED_PIN_1 = 36; // 예시 핀 번호
+    private static final int LED_PIN_1 = 32; // 예시 핀 번호
     private static final int LED_PIN_2 = 38; // 예시 핀 번호
     private static final int LED_PIN_3 = 40; // 예시 핀 번호
 
@@ -43,7 +43,7 @@ public class PinController {
     }
 
     private void initializePins() {
-        ledGpio1 = new Gpio(LED_PIN_1);                //36번 LED
+        ledGpio1 = new Gpio(LED_PIN_1);                //32번 LED
         ledGpio1.dir(Dir.DIR_OUT);
 
         ledGpio2 = new Gpio(LED_PIN_2);                //38번 LED

@@ -87,11 +87,18 @@ public class ValveService extends Service {
     }
 
     private void controlProportionalValve(double pidOutput) {
-        // PID 출력 값을 4~20mA 신호로 변환하여 비례제어 밸브를 제어하는 로직
-        // 예: pidOutput 값을 4~20mA 범위로 변환하여 ad5420에 설정
-        double mAValue = 4.0 + (16.0 * (pidOutput / 100.0)); // 예제 변환 (0~100%를 4~20mA로)
-        ad5420.DaisyCurrentWrite((char) 0, (short) mAValue);
-        Log.d(TAG, "Proportional valve set to: " + mAValue + "mA");
+        double minCurrent = 4.0;  // 4mA
+        double maxCurrent = 20.0; // 20mA
+
+// PID 출력 값을 이용하여 출력하고자 하는 전류를 계산 (0~100%를 이용하여)
+        double desiredCurrent = minCurrent + ((maxCurrent - minCurrent) * (pidOutput / 100.0));
+
+// 전류 값을 DAC의 16비트 값으로 변환 (0x0000 ~ 0xFFFF)
+        short dacValue = (short) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+
+// AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
+        ad5420.DaisyCurrentWrite((char) 0, dacValue);
+        Log.d(TAG, "Proportional valve set to: " + dacValue + "mA");
     }
 
     private void controlValves() {

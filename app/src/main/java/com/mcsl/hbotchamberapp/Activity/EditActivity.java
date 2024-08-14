@@ -468,6 +468,8 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
+
+
     private void updateNumberOfSections() {
         if (currentProfile != null) {
             int numSections = currentProfile.size();

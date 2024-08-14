@@ -169,7 +169,7 @@ public class SensorService extends Service {
 
     private double calibrateOxygenValue(int rawOxygenValue) {
         int a0 = 46;
-        int a1 = 10602;
+        int a1 = 8045;
 
         double O2Value = ((double)(rawOxygenValue - a0)) * 2090.0 / (double) (a1 - a0);
         return Math.round(O2Value) / 100.0;
