@@ -52,6 +52,9 @@ public class RunActivity extends AppCompatActivity {
     private ActivityRunBinding binding;
     private RunViewModel viewModel;
 
+    private long totalProfileTime;
+
+
     private boolean isPaused = false;
     private boolean isRunning = false;
 
@@ -73,11 +76,41 @@ public class RunActivity extends AppCompatActivity {
         }
     };
 
+
+
     private BroadcastReceiver stopGraphReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE".equals(intent.getAction())) {
-                handler.removeCallbacks(elapsedTimeRunnable);  // 그래프 업데이트를 중지
+
+
+                isRunning = false; // 런 상태 종료
+                isPaused = false;
+                btnPauseResume.setText("Pause");
+
+                // 그래프 업데이트 중지
+                chart.setNoDataText("End of Profile");
+                chart.invalidate();
+            }
+        }
+    };
+
+    private BroadcastReceiver setPointReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("com.mcsl.hbotchamberapp.SETPOINT_UPDATE".equals(intent.getAction())) {
+                double setPoint = intent.getDoubleExtra("setPoint", 0.0);
+                updateSetPointDisplay(setPoint);
+            }
+        }
+    };
+
+    private BroadcastReceiver elapsedTimeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("com.mcsl.hbotchamberapp.ELAPSED_TIME_UPDATE".equals(intent.getAction())) {
+                long elapsedTime = intent.getLongExtra("elapsedTime", 0);
+                binding.elapsedTime.setText(formatElapsedTime(elapsedTime));
             }
         }
     };
@@ -118,6 +151,17 @@ public class RunActivity extends AppCompatActivity {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
+        // SetPoint 리시버 등록
+        LocalBroadcastManager.getInstance(this).registerReceiver(setPointReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.SETPOINT_UPDATE"));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(stopGraphReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE"));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(elapsedTimeReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.ELAPSED_TIME_UPDATE"));
+
+
         viewModel.getProfileData().observe(this, new Observer<List<String[]>>() {
             @Override
             public void onChanged(List<String[]> data) {
@@ -150,13 +194,28 @@ public class RunActivity extends AppCompatActivity {
                 LocalBroadcastManager.getInstance(RunActivity.this).registerReceiver(sensorValuesReceiver,
                         new IntentFilter("com.mcsl.hbotchamberapp.PRESSURE_UPDATE"));
 
-                startElapsedTimeUpdate();
 
 
                 // PID 제어 시작을 위해 PidService를 호출
                 Intent pidIntent = new Intent(RunActivity.this, PidService.class);
                 pidIntent.setAction("com.mcsl.hbotchamberapp.action.START_PID");
                 startService(pidIntent);  // PidService 시작
+            }
+        });
+
+        binding.btnEnd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // PID 서비스 종료
+                Intent stopIntent = new Intent(RunActivity.this, PidService.class);
+                stopIntent.setAction("com.mcsl.hbotchamberapp.action.STOP_PID");
+                startService(stopIntent);
+
+                // 그래프 업데이트 중지
+
+                isRunning = false;
+                isPaused = false;
+                btnPauseResume.setText("Pause");
             }
         });
 
@@ -167,12 +226,12 @@ public class RunActivity extends AppCompatActivity {
                     isPaused = false;
                     btnPauseResume.setText("Pause");
                     startTime = System.currentTimeMillis() - elapsedTimeWhenPaused;  // 재개 시 시간 초기화
-                    startElapsedTimeUpdate();  // 경과 시간 업데이트 재개
+
                 } else {
                     isPaused = true;
                     btnPauseResume.setText("Resume");
                     elapsedTimeWhenPaused = System.currentTimeMillis() - startTime;  // 일시 정지 시 경과 시간 저장
-                    handler.removeCallbacks(elapsedTimeRunnable);  // 경과 시간 업데이트 중지
+
                 }
             }
         });
@@ -224,27 +283,10 @@ public class RunActivity extends AppCompatActivity {
         }
     }
 
-    private void startElapsedTimeUpdate() {
-        handler.post(elapsedTimeRunnable);  // 경과 시간 업데이트 시작
-    }
 
-    private void updateChamberPressure(double pressure) {
-        String press = String.format(" %.2f ATA", pressure);
-        binding.chamberPressure.setText(press);
-    }
-
-    private final Runnable elapsedTimeRunnable = new Runnable() {
-        @Override
-        public void run() {
-            long elapsedMillis = System.currentTimeMillis() - startTime;
-            viewModel.setElapsedTime(elapsedMillis);
-
-            // 다음 업데이트 예약
-            handler.postDelayed(this, 1000);
-        }
-    };
 
     private String formatElapsedTime(long elapsedTime) {
+
         int seconds = (int) (elapsedTime / 1000);
         int minutes = seconds / 60;
         int hours = minutes / 60;
@@ -255,6 +297,7 @@ public class RunActivity extends AppCompatActivity {
     }
 
     private List<String[]> loadProfileData() {
+        long totalTime = 0;
         List<String[]> profileData = new ArrayList<>();
         try (FileInputStream fis = openFileInput("profile_data.json");
              InputStreamReader isr = new InputStreamReader(fis);
@@ -268,11 +311,30 @@ public class RunActivity extends AppCompatActivity {
             Type type = new TypeToken<List<String[]>>() {
             }.getType();
             profileData = gson.fromJson(sb.toString(), type);
+
+            // totalProfileTime 계산
+            for (String[] section : profileData) {
+                long duration = (long) (Double.parseDouble(section[3]) * 60 * 1000); // 분을 밀리초로 변환
+                totalTime += duration;
+            }
+            totalProfileTime = totalTime; // 계산된 전체 프로파일 시간을 저장
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         return profileData;
     }
+
+    private void updateChamberPressure(double pressure) {
+        String press = String.format(" %.2f ATA", pressure);
+        binding.chamberPressure.setText(press);
+    }
+
+    private void updateSetPointDisplay(double setPoint) {
+        String setPointText = String.format("%.2f ATA", setPoint);
+        binding.setPointPressure.setText(setPointText);
+    }
+
 
 
     @Override
@@ -280,6 +342,8 @@ public class RunActivity extends AppCompatActivity {
         super.onDestroy();
         binding = null;
         try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(stopGraphReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(elapsedTimeReceiver);
             LocalBroadcastManager.getInstance(this).unregisterReceiver(sensorValuesReceiver);
         } catch (IllegalArgumentException e) {
             // 리시버가 등록되지 않은 상태에서 해제하려고 할 때의 예외 처리

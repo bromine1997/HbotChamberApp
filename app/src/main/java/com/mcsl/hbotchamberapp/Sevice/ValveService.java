@@ -41,14 +41,28 @@ public class ValveService extends Service {
     private PinController pinController;
     private Ad5420 ad5420;
 
-    private BroadcastReceiver pidOutputReceiver = new BroadcastReceiver() {
+
+
+    private BroadcastReceiver pressPidOutputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("com.mcsl.hbotchamberapp.PID_OUTPUT_UPDATE".equals(intent.getAction())) {
+            if ("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL".equals(intent.getAction())) {
                 double pidOutput = intent.getDoubleExtra("pidOutput", 0.0);
                 Log.d(TAG, "Received PID output: " + pidOutput);
                 // PID 출력 값을 이용해 비례제어 밸브를 제어하는 로직을 추가
-                controlProportionalValve(pidOutput);
+                PidControlPressProportionValve(pidOutput);
+            }
+        }
+    };
+
+    private BroadcastReceiver ventPidOutputReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL".equals(intent.getAction())) {
+                double pidOutput = intent.getDoubleExtra("pidOutput", 0.0);
+                Log.d(TAG, "Received PID output: " + pidOutput);
+                // PID 출력 값을 이용해 비례제어 밸브를 제어하는 로직을 추가
+                PidControlVentProportionValve(pidOutput);
             }
         }
     };
@@ -82,8 +96,13 @@ public class ValveService extends Service {
 
         handler.postDelayed(valveRunnable, 1000);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(pidOutputReceiver,
-                new IntentFilter("com.mcsl.hbotchamberapp.PID_OUTPUT_UPDATE"));
+
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(pressPidOutputReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL"));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(ventPidOutputReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL"));
     }
 
     private void controlProportionalValve(double pidOutput) {
@@ -99,6 +118,37 @@ public class ValveService extends Service {
 // AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
         ad5420.DaisyCurrentWrite((char) 0, dacValue);
         Log.d(TAG, "Proportional valve set to: " + dacValue + "mA");
+    }
+
+
+    private void PidControlPressProportionValve(double pidOutput) {
+        double minCurrent = 4.0;  // 4mA
+        double maxCurrent = 20.0; // 20mA
+
+        // PID 출력 값을 이용하여 출력하고자 하는 전류를 계산 (0~100%를 이용하여)
+        double desiredCurrent = minCurrent + ((maxCurrent - minCurrent) * (pidOutput / 100.0));
+
+        // 전류 값을 DAC의 16비트 값으로 변환 (0x0000 ~ 0xFFFF)
+        short dacValue = (short) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+
+        // AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
+        ad5420.DaisyCurrentWrite((char) 0, dacValue);
+
+    }
+
+    private void PidControlVentProportionValve(double pidOutput) {
+        double minCurrent = 4.0;  // 4mA
+        double maxCurrent = 20.0; // 20mA
+
+        // PID 출력 값을 이용하여 출력하고자 하는 전류를 계산 (0~100%를 이용하여)
+        double desiredCurrent = minCurrent + ((maxCurrent - minCurrent) * (pidOutput / 100.0));
+
+        // 전류 값을 DAC의 16비트 값으로 변환 (0x0000 ~ 0xFFFF)
+        short dacValue = (short) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+
+        // AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
+        ad5420.DaisyCurrentWrite((char) 1, dacValue);
+
     }
 
     private void controlValves() {
@@ -186,7 +236,8 @@ public class ValveService extends Service {
         Log.d(TAG, "Valve 서비스가 종료되었습니다.");
         handler.removeCallbacks(valveRunnable);
         handler.getLooper().quit(); // HandlerThread 종료
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(pidOutputReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pressPidOutputReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ventPidOutputReceiver);
     }
 
     private void sendBroadcastUpdate(String status) {

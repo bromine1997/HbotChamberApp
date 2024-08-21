@@ -29,9 +29,19 @@ public class PidService extends Service {
     private static final String TAG = "PIDService";
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
-    private Pid pidController;
+    private Pid pressPidController;
+
+    private Pid ventPidController;
     private double setPoint;
     private double currentPressure;
+
+    private Intent pressValvePidIntent;
+    private Intent ventValvePidIntent;
+
+
+    private Intent setPointIntent; // Intent 객체 재사용을 위한 멤버 변수
+
+    private Intent elapsedTimeIntent; //경과 시간 업데이트 변수
 
     private List<String[]> profileData;  // 프로파일 데이터를 저장할 변수
 
@@ -56,11 +66,26 @@ public class PidService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        pidController = new Pid(15.0, 10.00, 0.1);
-        scheduler = Executors.newScheduledThreadPool(1);
+
+
+        pressPidController = new Pid(15.0, 10.00, 0.1);                                          //
+        
+        ventPidController = new Pid(15.0,10.00,0.1);
+        ventPidController.setDirection(true);
+        
+        scheduler = Executors.newScheduledThreadPool(1);                                    //pid 제어를 위한 스레드풀 생성
 
         LocalBroadcastManager.getInstance(this).registerReceiver(pressureReceiver,
-                new IntentFilter("com.mcsl.hbotchamberapp.PRESSURE_UPDATE"));
+                new IntentFilter("com.mcsl.hbotchamberapp.PRESSURE_UPDATE"));                   //Pid 제어할때 사용할 압력 값 수신 Reciver
+
+        // Intent 객체 초기화
+        setPointIntent = new Intent("com.mcsl.hbotchamberapp.SETPOINT_UPDATE");                 // Run Activity에서 사용할 Setpoint 보내기 위한 Intent 객체 생성 --> Run Activity에서 수신
+
+        elapsedTimeIntent = new Intent("com.mcsl.hbotchamberapp.ELAPSED_TIME_UPDATE");          //Run Activity에서 사용할 경과 시간 측정후 보내기 위한 Intent 객체 생성 --> Run Activity에서 수신
+
+        pressValvePidIntent = new Intent("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL");        //PRESS valve PID boradcast 보내기위한 Intent 객체 생성 --> Valve service에서 수신
+
+        ventValvePidIntent = new Intent("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL");          //Vent valve PID boradcast 보내기위한 Intent 객체 생성 --> Valve service에서 수신
     }
 
     private void startPIDControl(List<String[]> profileData) {
@@ -74,12 +99,23 @@ public class PidService extends Service {
 
             @Override
             public void run() {
+
+                double output = 0;  // PID OUTPUT
+
                 long elapsedTime = System.currentTimeMillis() - startTime;
 
-                // 전체 프로파일 시간이 경과하면 PID 제어 종료
-                if (elapsedTime >= totalProfileTime) {
+                elapsedTimeIntent.putExtra("elapsedTime", elapsedTime);
+                LocalBroadcastManager.getInstance(PidService.this).sendBroadcast(elapsedTimeIntent);
+
+                // 전체 프로파일 시간이 정확히 경과했을 때 PID 제어 종료
+                if (elapsedTime > totalProfileTime) {
                     stopPIDControl();
-                    stopGraphUpdate(); // 그래프 업데이트 중지
+
+                    // RunActivity에게 그래프 업데이트를 중지하라는 신호를 보냄
+                    Intent stopGraphIntent = new Intent("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE");
+                    LocalBroadcastManager.getInstance(PidService.this).sendBroadcast(stopGraphIntent);
+
+                    stopSelf(); // 서비스 종료
                     return;
                 }
 
@@ -98,15 +134,40 @@ public class PidService extends Service {
                         sectionStartTime = System.currentTimeMillis();  // 다음 섹션 시작 시간 초기화
                     }
 
-                    // PID 제어 수행
-                    double output = pidController.getOutput(currentPressure, setPoint);
-                    if (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD) {
-                        controlPressValve(output);
-                    } else if (currentPhase == Phase.PRESSURE_DECREASE) {
-                        controlVentValve(output);
+                    // SetPoint 값을 전달하는 브로드캐스트 - Intent 객체 재사용
+                    setPointIntent.putExtra("setPoint", setPoint);
+                    LocalBroadcastManager.getInstance(PidService.this).sendBroadcast(setPointIntent);
+
+                    // 구간 판단 로직 추가
+                    if (currentSection > 0) {
+                        String[] previousSection = profileData.get(currentSection - 1);
+                        double previousEndPressure = Double.parseDouble(previousSection[2]);
+
+                        if (endPressure > previousEndPressure) {
+                            currentPhase = Phase.PRESSURE_INCREASE; // 가압 구간
+                        } else if (endPressure < previousEndPressure) {
+                            currentPhase = Phase.PRESSURE_DECREASE; // 감압 구간
+                        } else {
+                            currentPhase = Phase.PRESSURE_HOLD; // 유지 구간
+                        }
+                    } else {
+                        // 첫 섹션은 기본적으로 가압 구간으로 처리
+                        currentPhase = Phase.PRESSURE_INCREASE;
                     }
 
-                    sendPidOutput(output);
+
+                    // PID 제어 수행
+                    if (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD) {
+
+                        output = pressPidController.getOutput(currentPressure, setPoint);
+                        controlPressValve(output);
+                        Log.d(TAG, "가압중입니다~~~~~~~~~~~~~~~~~~~~~~~ " );
+                    } else if (currentPhase == Phase.PRESSURE_DECREASE) {
+                        output = ventPidController.getOutput(currentPressure, setPoint);
+                        controlVentValve(output);
+                        Log.d(TAG, "감압중입니다@@@@@@@@@@@@@@@@@@@@@@@ " );
+                    }
+
                 }
             }
         }, 0, 1, TimeUnit.SECONDS);
@@ -115,24 +176,17 @@ public class PidService extends Service {
 
 
     private void controlPressValve(double output) {
-        // Press Valve 제어 로직
-        Intent intent = new Intent("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL");
-        intent.putExtra("valveOutput", output);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        //Press Valve PID Broadcast
+        pressValvePidIntent.putExtra("valveOutput", output);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(pressValvePidIntent);
     }
 
     private void controlVentValve(double output) {
-        // Vent Valve 제어 로직
-        Intent intent = new Intent("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL");
-        intent.putExtra("valveOutput", output);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        //Vent Valve PID Broadcast
+        ventValvePidIntent.putExtra("valveOutput", output);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(ventValvePidIntent);
     }
 
-    private void sendPidOutput(double output) {
-        Intent intent = new Intent("com.mcsl.hbotchamberapp.PID_OUTPUT_UPDATE");
-        intent.putExtra("pidOutput", output);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
 
     // PID 제어를 일시 정지하는 메소드
     private void pausePIDControl() {
@@ -156,6 +210,10 @@ public class PidService extends Service {
         if (scheduler != null) {
             scheduler.shutdown();
         }
+
+        // RunActivity에게 그래프 업데이트를 중지하라는 신호를 보냄
+        Intent stopGraphIntent = new Intent("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(stopGraphIntent);
     }
 
     private void stopGraphUpdate() {
