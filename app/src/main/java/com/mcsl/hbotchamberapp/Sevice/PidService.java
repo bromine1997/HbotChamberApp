@@ -192,6 +192,7 @@ public class PidService extends Service {
     private void pausePIDControl() {
         if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
             scheduledFuture.cancel(false);
+
         }
     }
 
@@ -214,11 +215,6 @@ public class PidService extends Service {
         // RunActivity에게 그래프 업데이트를 중지하라는 신호를 보냄
         Intent stopGraphIntent = new Intent("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE");
         LocalBroadcastManager.getInstance(this).sendBroadcast(stopGraphIntent);
-    }
-
-    private void stopGraphUpdate() {
-        Intent intent = new Intent("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
 

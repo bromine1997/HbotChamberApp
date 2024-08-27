@@ -16,9 +16,8 @@ import com.mcsl.hbotchamberapp.Controller.Ad5420;
 import com.mcsl.hbotchamberapp.Controller.PinController;
 
 public class ValveService extends Service {
-    private static final String TAG = "GPIOService";
-    private Handler handler;
-    private Runnable valveRunnable;
+    private static final String TAG = "ValveService";
+
 
     private static final String ACTION_Sol_PRESS_ON = "com.mcsl.hbotchamberapp.action.SOL_PRESS_ON";
     private static final String ACTION_Sol_PRESS_OFF = "com.mcsl.hbotchamberapp.action.SOL_PRESS_OFF";
@@ -42,6 +41,29 @@ public class ValveService extends Service {
     private Ad5420 ad5420;
 
 
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        pinController = new PinController();
+        ad5420 = new Ad5420(0);
+
+        // Daisy_reset을 실행하고 1밀리초 지연 후 Daisy_Setup을 실행
+        ad5420.Daisy_reset();
+        try {
+            Thread.sleep(1); // 1밀리초 지연
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ad5420.Daisy_Setup();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(pressPidOutputReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL"));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(ventPidOutputReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL"));
+    }
 
     private BroadcastReceiver pressPidOutputReceiver = new BroadcastReceiver() {
         @Override
@@ -67,58 +89,8 @@ public class ValveService extends Service {
         }
     };
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        pinController = new PinController();
-        ad5420 = new Ad5420(0);
-
-        // Daisy_reset을 실행하고 1밀리초 지연 후 Daisy_Setup을 실행
-        ad5420.Daisy_reset();
-        try {
-            Thread.sleep(1); // 1밀리초 지연
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        ad5420.Daisy_Setup();
-
-        HandlerThread handlerThread = new HandlerThread("GPIOServiceBackgroundThread");
-        handlerThread.start();
-        handler = new Handler(handlerThread.getLooper());
-
-        valveRunnable = new Runnable() {
-            @Override
-            public void run() {
-                //controlValves();
-                handler.postDelayed(this, 1000); // 1초마다 실행
-            }
-        };
-
-        handler.postDelayed(valveRunnable, 1000);
 
 
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(pressPidOutputReceiver,
-                new IntentFilter("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL"));
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(ventPidOutputReceiver,
-                new IntentFilter("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL"));
-    }
-
-    private void controlProportionalValve(double pidOutput) {
-        double minCurrent = 4.0;  // 4mA
-        double maxCurrent = 20.0; // 20mA
-
-// PID 출력 값을 이용하여 출력하고자 하는 전류를 계산 (0~100%를 이용하여)
-        double desiredCurrent = minCurrent + ((maxCurrent - minCurrent) * (pidOutput / 100.0));
-
-// 전류 값을 DAC의 16비트 값으로 변환 (0x0000 ~ 0xFFFF)
-        short dacValue = (short) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
-
-// AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
-        ad5420.DaisyCurrentWrite((char) 0, dacValue);
-        Log.d(TAG, "Proportional valve set to: " + dacValue + "mA");
-    }
 
 
     private void PidControlPressProportionValve(double pidOutput) {
@@ -151,15 +123,6 @@ public class ValveService extends Service {
 
     }
 
-    private void controlValves() {
-        Log.d(TAG, "Valves PID Start");
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Valves PID processing");
-            }
-        }, 1000);
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -234,8 +197,6 @@ public class ValveService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "Valve 서비스가 종료되었습니다.");
-        handler.removeCallbacks(valveRunnable);
-        handler.getLooper().quit(); // HandlerThread 종료
         LocalBroadcastManager.getInstance(this).unregisterReceiver(pressPidOutputReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ventPidOutputReceiver);
     }
