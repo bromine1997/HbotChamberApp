@@ -212,10 +212,10 @@ public class RunActivity extends AppCompatActivity {
                 startService(stopIntent);
 
                 // 그래프 업데이트 중지
-
                 isRunning = false;
                 isPaused = false;
                 btnPauseResume.setText("Pause");
+
             }
         });
 
@@ -223,18 +223,42 @@ public class RunActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isPaused) {
+                    // Resume PID control
                     isPaused = false;
                     btnPauseResume.setText("Pause");
-                    startTime = System.currentTimeMillis() - elapsedTimeWhenPaused;  // 재개 시 시간 초기화
+                    startTime = System.currentTimeMillis() - elapsedTimeWhenPaused;  // Recalculate start time for elapsed duration
+
+                    // Re-register the elapsedTimeReceiver to resume receiving updates
+                    LocalBroadcastManager.getInstance(RunActivity.this).registerReceiver(elapsedTimeReceiver,
+                            new IntentFilter("com.mcsl.hbotchamberapp.ELAPSED_TIME_UPDATE"));
+
+                    // Send resume command to PidService
+                    Intent resumeIntent = new Intent(RunActivity.this, PidService.class);
+                    resumeIntent.setAction("com.mcsl.hbotchamberapp.action.RESUME_PID");
+                    startService(resumeIntent);
 
                 } else {
+                    // Pause PID control
                     isPaused = true;
                     btnPauseResume.setText("Resume");
-                    elapsedTimeWhenPaused = System.currentTimeMillis() - startTime;  // 일시 정지 시 경과 시간 저장
+                    elapsedTimeWhenPaused = System.currentTimeMillis() - startTime;  // Save elapsed time when paused
 
+                    // Unregister the elapsedTimeReceiver to stop receiving updates
+                    LocalBroadcastManager.getInstance(RunActivity.this).unregisterReceiver(elapsedTimeReceiver);
+
+                    // Send pause command to PidService
+                    Intent pauseIntent = new Intent(RunActivity.this, PidService.class);
+                    pauseIntent.setAction("com.mcsl.hbotchamberapp.action.PAUSE_PID");
+                    startService(pauseIntent);
+
+                    // 모든 벨브를 멈추는 브로드캐스트 전송
+                    Intent stopAllValvesIntent = new Intent("com.mcsl.hbotchamberapp.STOP_ALL_VALVES");
+                    LocalBroadcastManager.getInstance(RunActivity.this).sendBroadcast(stopAllValvesIntent);
                 }
             }
         });
+
+
     }
 
     private void updateProfileChart(List<String[]> data) {

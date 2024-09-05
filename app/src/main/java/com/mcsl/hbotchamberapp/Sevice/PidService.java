@@ -45,6 +45,12 @@ public class PidService extends Service {
 
     private List<String[]> profileData;  // 프로파일 데이터를 저장할 변수
 
+    private long elapsedTime = 0;
+
+    private boolean isPaused = false;  // To track if the PID control is paused
+    private long pauseStartTime = 0;   // To store when the pause started
+    private long totalPausedDuration = 0; // To accumulate the total duration of pauses
+
     private enum Phase {
         PRESSURE_INCREASE, // 가압 구간
         PRESSURE_HOLD,     // 유지 구간
@@ -90,6 +96,7 @@ public class PidService extends Service {
 
     private void startPIDControl(List<String[]> profileData) {
         final long totalProfileTime = calculateTotalProfileTime(profileData); // 전체 프로파일 시간 계산
+
         final long startTime = System.currentTimeMillis(); // PID 시작 시간
 
         scheduler = Executors.newScheduledThreadPool(1);
@@ -102,7 +109,7 @@ public class PidService extends Service {
 
                 double output = 0;  // PID OUTPUT
 
-                long elapsedTime = System.currentTimeMillis() - startTime;
+                elapsedTime = System.currentTimeMillis() - startTime;
 
                 elapsedTimeIntent.putExtra("elapsedTime", elapsedTime);
                 LocalBroadcastManager.getInstance(PidService.this).sendBroadcast(elapsedTimeIntent);
@@ -121,9 +128,11 @@ public class PidService extends Service {
 
                 if (currentSection < profileData.size()) {
                     String[] section = profileData.get(currentSection);
+
                     double startPressure = Double.parseDouble(section[1]);
                     double endPressure = Double.parseDouble(section[2]);
-                    long duration = (long) (Double.parseDouble(section[3]) * 60 * 1000); // 분을 밀리초로 변환
+
+                    long duration = (long) (Double.parseDouble(section[3]) * 60 * 1000); // 각 섹션의 time(분)을 밀리초로 변환
 
                     long sectionElapsedTime = System.currentTimeMillis() - sectionStartTime;
                     if (sectionElapsedTime < duration) {
@@ -192,7 +201,8 @@ public class PidService extends Service {
     private void pausePIDControl() {
         if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
             scheduledFuture.cancel(false);
-
+            isPaused = true;
+            pauseStartTime = System.currentTimeMillis();  // 일시 정지 시작 시간 기록
         }
     }
 
@@ -201,6 +211,7 @@ public class PidService extends Service {
         if (scheduledFuture == null || scheduledFuture.isCancelled()) {
             if (profileData != null && !profileData.isEmpty()) {
                 startPIDControl(profileData);
+
             }
         }
     }
@@ -215,6 +226,16 @@ public class PidService extends Service {
         // RunActivity에게 그래프 업데이트를 중지하라는 신호를 보냄
         Intent stopGraphIntent = new Intent("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE");
         LocalBroadcastManager.getInstance(this).sendBroadcast(stopGraphIntent);
+
+        // 모든 벨브를 멈추는 브로드캐스트 전송
+        Intent stopAllValvesIntent = new Intent("com.mcsl.hbotchamberapp.STOP_ALL_VALVES");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(stopAllValvesIntent);
+    }
+
+    private void stopAllValves() {
+        // 벨브를 모두 끄는 로직
+        controlPressValve(0);  // 압력 벨브를 닫습니다.
+        controlVentValve(0);   // 배기 벨브를 닫습니다.
     }
 
 

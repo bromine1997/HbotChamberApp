@@ -112,29 +112,25 @@ public class IoPortActivity extends AppCompatActivity {
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_PRESS_ON");                  //솔레노이드 온
         });
         binding.controlSolPRESSOFF.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_PRESS_OFF");                  //솔레노이드 오프
         });
 
 
-        binding.ProportionalPRESSON.setOnClickListener(v -> {
 
+        binding.ProportionalPRESSON.setOnClickListener(v -> {
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_PRESS_ON");                     //비례제어 온오프
         });
         binding.ProportionalPRESSOFF.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_PRESS_OFF");                     //비례제어 온오프
         });
 
 
 
         binding.controlProportionPressDown.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_DOWN");
         });
 
         binding.controlProportionPressUP.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.PRESS_VALVE_UP");
         });
 
@@ -145,17 +141,14 @@ public class IoPortActivity extends AppCompatActivity {
         });
 
         binding.controlSolVENTOFF.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.SOL_VENT_OFF");
         });
 
 
         binding.ProportionalVENTON.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_VENT_ON");
         });
         binding.ProportionalVENTOFF.setOnClickListener(v -> {
-
             sendValveServiceAction("com.mcsl.hbotchamberapp.action.Proportional_VENT_OFF");
         });
 

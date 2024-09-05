@@ -44,7 +44,9 @@ dependencies {
     val work_version = "2.9.0"
     // (Java only)
     implementation("androidx.work:work-runtime:$work_version")
-    
+
+
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 
     // retrofit2
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")

@@ -63,6 +63,10 @@ public class ValveService extends Service {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(ventPidOutputReceiver,
                 new IntentFilter("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL"));
+
+        // STOP_ALL_VALVES 브로드캐스트를 수신하는 리시버 등록
+        LocalBroadcastManager.getInstance(this).registerReceiver(stopAllValvesReceiver,
+                new IntentFilter("com.mcsl.hbotchamberapp.STOP_ALL_VALVES"));
     }
 
     private BroadcastReceiver pressPidOutputReceiver = new BroadcastReceiver() {
@@ -89,11 +93,24 @@ public class ValveService extends Service {
         }
     };
 
+    private BroadcastReceiver stopAllValvesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("com.mcsl.hbotchamberapp.STOP_ALL_VALVES".equals(intent.getAction())) {
+                // 모든 벨브를 끄는 로직
+                stopAllValves();
+            }
+        }
+    };
 
 
 
 
     private void PidControlPressProportionValve(double pidOutput) {
+
+        pinController.Sol_OUPUT(0, 1);          // 가압 솔 벨브 on
+        pinController.Sol_OUPUT(1, 0);          // 배기 솔 벨브 off
+
         double minCurrent = 4.0;  // 4mA
         double maxCurrent = 20.0; // 20mA
 
@@ -109,6 +126,10 @@ public class ValveService extends Service {
     }
 
     private void PidControlVentProportionValve(double pidOutput) {
+
+        pinController.Sol_OUPUT(0, 0);          // 가압 솔 벨브 off
+        pinController.Sol_OUPUT(1, 1);          // 배기 솔 벨브 on
+
         double minCurrent = 4.0;  // 4mA
         double maxCurrent = 20.0; // 20mA
 
@@ -122,6 +143,19 @@ public class ValveService extends Service {
         ad5420.DaisyCurrentWrite((char) 1, dacValue);
 
     }
+
+
+    private void stopAllValves() {
+        // 모든 벨브를 끄는 로직 구현
+        pinController.Sol_OUPUT(0, 0);  // 가압 솔 벨브 OFF
+        pinController.Sol_OUPUT(1, 0);  // 배기 솔 벨브 OFF
+        pinController.Proportion_Press_OFF();  // 비례제어 가압 벨브 OFF
+        pinController.Proportion_VENT_OFF();   // 비례제어 배기 벨브 OFF
+        ad5420.DaisyCurrentWrite((char) 0, (short) 0); // 압력 벨브 전류 0으로 설정
+        ad5420.DaisyCurrentWrite((char) 1, (short) 0); // 배기 벨브 전류 0으로 설정
+        Log.d(TAG, "모든 벨브가 종료되었습니다.");
+    }
+
 
 
     @Override
