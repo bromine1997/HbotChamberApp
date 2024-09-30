@@ -44,6 +44,7 @@ public class RunActivity extends AppCompatActivity {
     private LineChart chart;
     private LineData lineData;
     private LineDataSet profileDataSet;
+
     private LineDataSet pressureDataSet;
     private float minY = Float.MAX_VALUE;
     private float maxY = Float.MIN_VALUE;
