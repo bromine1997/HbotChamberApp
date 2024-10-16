@@ -1,7 +1,9 @@
 package com.mcsl.hbotchamberapp.Activity;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -23,31 +25,36 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
 import android.widget.Toast;
 
 import com.mcsl.hbotchamberapp.R;
 import com.mcsl.hbotchamberapp.databinding.ActivityEditBinding;
+import com.mcsl.hbotchamberapp.model.ProfileSection;
+import com.mcsl.hbotchamberapp.model.ProfileRequest;
+import com.mcsl.hbotchamberapp.network.ApiClient;
+import com.mcsl.hbotchamberapp.network.ApiService;
+
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.*;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import okhttp3.OkHttpClient;
+
 
 public class EditActivity extends AppCompatActivity {
-    private Runnable runnableCode;
+    private ActivityEditBinding binding;
+
     private LineChart chart;
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private List<String[]> currentProfile = new ArrayList<>();
     private int currentSectionIndex = 0;
-
-    private ActivityEditBinding binding;
+    private static final String PROFILE_SAVE_URL = "http://192.168.0.125:8080/profile/save"; // 프로파일 저장 API URL
+    private OkHttpClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +63,27 @@ public class EditActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
+        client = new OkHttpClient();
+
+
         initializeUIComponents();
         initializeChart();
         initializetableChart();
 
-        runnableCode = () -> {
-            // 여기에 주기적으로 실행할 코드 .edit 화면에서는 주기적으로 실행할 코드가 없으므로 필요 없음.
-        };
+
     }
+
+    // 사용자 ID 및 이름을 SharedPreferences에서 불러오는 메서드
+    private String getUserId() {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        return sharedPreferences.getString("user_id", null);  // 저장된 userId 반환
+    }
+
+    private String getUsername() {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        return sharedPreferences.getString("username", null);  // 저장된 사용자 이름 반환
+    }
+
 
     private void initializetableChart() {
         TableLayout tableChart = binding.Table;
@@ -217,10 +237,60 @@ public class EditActivity extends AppCompatActivity {
 
         binding.btnSave.setOnClickListener(v -> {
             saveProfileData();
+            sendProfileDataToServer();
             Toast.makeText(EditActivity.this, "저장되었습니다", Toast.LENGTH_SHORT).show();
         });
 
         binding.btnExit.setOnClickListener(v -> finish());
+    }
+
+    private void sendProfileDataToServer() {
+        // currentProfile을 ProfileSection 리스트로 변환
+        List<ProfileSection> profileSections = convertToProfileSections(currentProfile);
+
+        // ProfileRequest 객체 생성
+        ProfileRequest profileRequest = new ProfileRequest(profileSections);
+
+        // Retrofit을 통해 ApiService 생성
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        // 서버로 데이터 전송
+        Call<Void> call = apiService.saveProfile(profileRequest);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // 서버로 전송 성공
+                    runOnUiThread(() -> Toast.makeText(EditActivity.this, "프로파일이 서버에 저장되었습니다.", Toast.LENGTH_SHORT).show());
+                } else {
+                    // 서버 응답 에러 처리
+                    runOnUiThread(() -> Toast.makeText(EditActivity.this, "서버에 저장하는 데 실패했습니다.", Toast.LENGTH_SHORT).show());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // 네트워크 오류 등 처리
+                runOnUiThread(() -> Toast.makeText(EditActivity.this, "서버에 저장하는 중 오류 발생: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private List<ProfileSection> convertToProfileSections(List<String[]> currentProfile) {
+        List<ProfileSection> profileSections = new ArrayList<>();
+        for (String[] sectionData : currentProfile) {
+            try {
+                String sectionNumber = sectionData[0];          // "#"
+                float startPressure = Float.parseFloat(sectionData[1]);    // "Start P"
+                float endPressure = Float.parseFloat(sectionData[2]);      // "End P"
+                float time = Float.parseFloat(sectionData[3]);             // "Time(min)"
+                ProfileSection section = new ProfileSection(sectionNumber, startPressure, endPressure, time);
+                profileSections.add(section);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return profileSections;
     }
 
     private void updateTable(List<String[]> profileData) {
@@ -480,12 +550,10 @@ public class EditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        handler.postDelayed(runnableCode, 1000);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        handler.removeCallbacks(runnableCode);
     }
 }

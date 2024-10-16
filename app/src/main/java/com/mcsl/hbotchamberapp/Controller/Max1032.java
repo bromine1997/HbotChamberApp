@@ -102,50 +102,6 @@ public class Max1032 {
     }
 
 
-    public static int ConfigurationChannel_TTTTT(int channel, int mode) {
-
-        byte[] responseBytes = new byte[4]; // 응답을 저장할 배열
-
-        if (channel < 0 || channel >= 7) {
-            throw new IllegalArgumentException("Invalid channel: " + channel);
-        }
-
-        byte command_Configuration = (byte) (MAX1032_START_BIT | (channel << 4)| MAX1032_single_mode | MAX1032_RangeSelect_3);
-        byte command_ModeSelect = (byte) (MAX1032_START_BIT| mode<<4|0x08);
-
-        byte command_Read = (byte) (MAX1032_START_BIT| (channel << 4));
-        byte[] commandRead_Bytes = new byte[] {command_Read,0,0,0};
-
-        //  spi5.write(commandBytes);              //spiWrite를 하면 자동으로 Latch가 내려감 ,.,..이거 고민해서 알고리즘 수정 필요..!
-
-        spi5.writeByte(command_Configuration);
-        spi5.writeByte(command_ModeSelect);
-
-        responseBytes=spi5.write(commandRead_Bytes);
-
-
-        // 응답에서 유효한 14비트 데이터 추출
-        int adcValue = ((responseBytes[2] & 0xFF) << 8) | (responseBytes[3] & 0xFF); // 상위 바이트와 하위 바이트 결합
-        adcValue = adcValue >> 3; // 하위 2비트 제거하여 14비트로 맞춤
-
-
-        return adcValue;
-
-    }
-
-
-
-
-    public int[] readAllChannels() {
-        int[] values = new int[6];
-        for (int channel = 0; channel < 6; channel++) {
-            values[channel] = ConfigurationChannel_TTTTT(channel,0);
-        }
-
-        Log.d(TAG, "values: " + Arrays.toString(values));
-        return values;
-    }
-
     public void ConfigAllChannels() {
 
         for (int channel = 0; channel < 6; channel++) {

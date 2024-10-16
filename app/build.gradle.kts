@@ -45,6 +45,7 @@ dependencies {
     // (Java only)
     implementation("androidx.work:work-runtime:$work_version")
 
+    implementation ("com.auth0.android:jwtdecode:2.0.0")
 
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 

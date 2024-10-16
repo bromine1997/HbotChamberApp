@@ -1,32 +1,31 @@
 package com.mcsl.hbotchamberapp.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import com.mcsl.hbotchamberapp.databinding.ActivityLoginBinding;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-
 import okhttp3.Response;
+import org.json.JSONObject;
+
+import com.auth0.android.jwt.JWT;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private OkHttpClient client;
-    private static final String LOGIN_URL = "http://your-server-url/login"; // 서버의 로그인 엔드포인트로 변경하세요
+    private static final String LOGIN_URL = "http://192.168.0.125:8080/auth/login"; // 서버 주소 설정
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     @Override
@@ -42,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         // Focus 요청
         binding.editTextUsername.requestFocus();
 
-        // 버튼 클릭 리스너 설정
+        // 로그인 버튼 클릭 리스너 설정
         binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
                 String username = binding.editTextUsername.getText().toString();
                 String password = binding.editTextPassword.getText().toString();
 
-                // 입력 값 검증 (예: 공백 체크)
+                // 입력 값 검증 (공백 체크)
                 if (username.isEmpty() || password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "아이디와 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
                     return;
@@ -78,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    // 서버에 로그인 요청을 보내는 메서드
     private void sendLoginRequest(String username, String password) throws Exception {
         // JSON 형식의 요청 바디 생성
         String json = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
@@ -101,40 +101,58 @@ public class LoginActivity extends AppCompatActivity {
                 // 서버로부터 응답을 받았을 때 처리
                 if (response.isSuccessful()) {
                     String responseBody = response.body().string();
+                    try {
+                        // JSON 응답 파싱
+                        JSONObject jsonResponse = new JSONObject(responseBody);
+                        String accessToken = jsonResponse.getString("access_token");
 
-                    // 응답 처리 (예: JSON 파싱)
-                    // 서버에서 {"success": true, "message": "Login successful"} 형태로 응답한다고 가정
-                    boolean success = false;
-                    String message = "로그인 실패";
+                        // JWT 토큰 저장 및 사용자 정보 저장
+                        saveJwtToken(accessToken);
+                        saveUserInfoFromToken(accessToken);
 
-                    // 간단한 방법으로 응답 처리 (JSON 파서 사용 권장)
-                    if (responseBody.contains("\"success\":true")) {
-                        success = true;
-                        message = "로그인 성공";
-                    } else if (responseBody.contains("\"message\"")) {
-                        int startIndex = responseBody.indexOf("\"message\":\"") + 10;
-                        int endIndex = responseBody.indexOf("\"", startIndex);
-                        message = responseBody.substring(startIndex, endIndex);
-                    }
-
-                    String finalMessage = message;
-                    boolean finalSuccess = success;
-
-                    runOnUiThread(() -> {
-                        if (finalSuccess) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(LoginActivity.this, "로그인 성공", Toast.LENGTH_SHORT).show();
                             // 로그인 성공 시 다음 액티비티로 이동
                             navigateToMenu();
-                        } else {
-                            // 로그인 실패
-                            Toast.makeText(LoginActivity.this, finalMessage, Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                        });
+
+                    } catch (Exception e) {
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, "응답 처리 오류: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    }
                 } else {
                     // 서버 오류 또는 응답 실패
                     runOnUiThread(() -> Toast.makeText(LoginActivity.this, "서버 오류: " + response.message(), Toast.LENGTH_SHORT).show());
                 }
             }
         });
+    }
+
+    // JWT 토큰을 SharedPreferences에 저장하는 메서드
+    private void saveJwtToken(String token) {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("jwt_token", token);
+        editor.apply();
+        Log.d("LoginActivity", "JWT 토큰 저장됨: " + token);
+    }
+
+    // JWT 토큰에서 사용자 ID와 이름을 추출하여 저장하는 메서드
+    private void saveUserInfoFromToken(String jwtToken) {
+        JWT jwt = new JWT(jwtToken);
+        String userId = jwt.getClaim("sub").asString();  // 'sub' 클레임에서 userId 추출
+        String username = jwt.getClaim("username").asString();  // 'username' 클레임에서 사용자명 추출
+
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("user_id", userId);  // userId 저장
+        editor.putString("username", username);  // 사용자명 저장
+        editor.apply();
+    }
+
+    // JWT 토큰을 불러오는 메서드 (필요할 때 사용)
+    private String getJwtToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        return sharedPreferences.getString("jwt_token", null);
     }
 
     private void navigateToMenu() {

@@ -44,6 +44,7 @@ public class PidService extends Service {
     private Intent elapsedTimeIntent; //경과 시간 업데이트 변수
 
     private List<String[]> profileData;  // 프로파일 데이터를 저장할 변수
+    private long startTime = 0;
 
     private long elapsedTime = 0;
 
@@ -75,10 +76,10 @@ public class PidService extends Service {
 
 
         pressPidController = new Pid(15.0, 10.00, 0.1);                                          //
-        
+
         ventPidController = new Pid(15.0,10.00,0.1);
         ventPidController.setDirection(true);
-        
+
         scheduler = Executors.newScheduledThreadPool(1);                                    //pid 제어를 위한 스레드풀 생성
 
         LocalBroadcastManager.getInstance(this).registerReceiver(pressureReceiver,
@@ -95,9 +96,13 @@ public class PidService extends Service {
     }
 
     private void startPIDControl(List<String[]> profileData) {
+
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis(); // Initialize only once
+        }
+
         final long totalProfileTime = calculateTotalProfileTime(profileData); // 전체 프로파일 시간 계산
 
-        final long startTime = System.currentTimeMillis(); // PID 시작 시간
 
         scheduler = Executors.newScheduledThreadPool(1);
         scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
@@ -107,9 +112,14 @@ public class PidService extends Service {
             @Override
             public void run() {
 
+                if (isPaused) {
+                    return; // 일시정지 상태에서는 실행하지 않음
+                }
+
                 double output = 0;  // PID OUTPUT
 
-                elapsedTime = System.currentTimeMillis() - startTime;
+                // 일시정지 시간을 뺀 경과 시간 계산
+                elapsedTime = System.currentTimeMillis() - startTime - totalPausedDuration;
 
                 elapsedTimeIntent.putExtra("elapsedTime", elapsedTime);
                 LocalBroadcastManager.getInstance(PidService.this).sendBroadcast(elapsedTimeIntent);
@@ -135,6 +145,7 @@ public class PidService extends Service {
                     long duration = (long) (Double.parseDouble(section[3]) * 60 * 1000); // 각 섹션의 time(분)을 밀리초로 변환
 
                     long sectionElapsedTime = System.currentTimeMillis() - sectionStartTime;
+
                     if (sectionElapsedTime < duration) {
                         setPoint = startPressure + ((endPressure - startPressure) * (sectionElapsedTime / (double) duration));
                     } else {
@@ -164,10 +175,8 @@ public class PidService extends Service {
                         currentPhase = Phase.PRESSURE_INCREASE;
                     }
 
-
                     // PID 제어 수행
                     if (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD) {
-
                         output = pressPidController.getOutput(currentPressure, setPoint);
                         controlPressValve(output);
                         Log.d(TAG, "가압중입니다~~~~~~~~~~~~~~~~~~~~~~~ " );
@@ -176,11 +185,11 @@ public class PidService extends Service {
                         controlVentValve(output);
                         Log.d(TAG, "감압중입니다@@@@@@@@@@@@@@@@@@@@@@@ " );
                     }
-
                 }
             }
         }, 0, 1, TimeUnit.SECONDS);
     }
+
 
 
 
@@ -199,22 +208,19 @@ public class PidService extends Service {
 
     // PID 제어를 일시 정지하는 메소드
     private void pausePIDControl() {
-        if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
-            scheduledFuture.cancel(false);
-            isPaused = true;
-            pauseStartTime = System.currentTimeMillis();  // 일시 정지 시작 시간 기록
-        }
+        isPaused = true;
+        pauseStartTime = System.currentTimeMillis();  // 일시 정지 시작 시간 기록
     }
 
     // PID 제어를 다시 시작하는 메소드
     private void resumePIDControl() {
-        if (scheduledFuture == null || scheduledFuture.isCancelled()) {
-            if (profileData != null && !profileData.isEmpty()) {
-                startPIDControl(profileData);
-
-            }
+        if (isPaused) {
+            totalPausedDuration += System.currentTimeMillis() - pauseStartTime;
+            isPaused = false;
         }
     }
+
+
 
 
     // PID 제어를 완전히 중지하는 메소드
@@ -222,6 +228,10 @@ public class PidService extends Service {
         if (scheduler != null) {
             scheduler.shutdown();
         }
+
+        startTime = 0;
+        totalPausedDuration = 0;
+        isPaused = false;
 
         // RunActivity에게 그래프 업데이트를 중지하라는 신호를 보냄
         Intent stopGraphIntent = new Intent("com.mcsl.hbotchamberapp.STOP_GRAPH_UPDATE");
