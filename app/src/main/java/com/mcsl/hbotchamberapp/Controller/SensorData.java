@@ -27,18 +27,6 @@ public class SensorData {
         return pressure;
     }
 
-    public void setPressure(double pressure) {
-        this.pressure = pressure;
-    }
-
-    public void setTemperature(double temperature) {
-        this.temperature = temperature;
-    }
-
-    public void setHumidity(double humidity) {
-        this.humidity = humidity;
-    }
-
 
     public double getTemperature() {
         return temperature;
@@ -53,8 +41,8 @@ public class SensorData {
         return oxygen;
     }
 
-    public void setOxygen(double oxygen) {
-        this.oxygen = oxygen;
+    public double getFlowRate() {
+        return flowRate;
     }
 
     public double getCo2() {
@@ -65,8 +53,21 @@ public class SensorData {
         this.co2 = co2;
     }
 
-    public double getFlowRate() {
-        return flowRate;
+    public void setPressure(double pressure) {
+        this.pressure = pressure;
+    }
+
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
+    }
+
+    public void setHumidity(double humidity) {
+        this.humidity = humidity;
+    }
+
+
+    public void setOxygen(double oxygen) {
+        this.oxygen = oxygen;
     }
 
     public void setFlowRate(double flowRate) {

@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.mcsl.hbotchamberapp.Sevice.GpioService;
-import com.mcsl.hbotchamberapp.Sevice.SensorService;
-import com.mcsl.hbotchamberapp.Sevice.ValveService;
+import com.mcsl.hbotchamberapp.Service.GpioService;
+import com.mcsl.hbotchamberapp.Service.SensorService;
+import com.mcsl.hbotchamberapp.Service.ValveService;
 import com.mcsl.hbotchamberapp.databinding.ActivityMenuBinding;
 
 public class MenuActivity extends AppCompatActivity {

@@ -1,16 +1,20 @@
-package com.mcsl.hbotchamberapp.Sevice;
+package com.mcsl.hbotchamberapp.Service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.mcsl.hbotchamberapp.Controller.Co2Sensor;
 import com.mcsl.hbotchamberapp.Controller.Max1032;
+import com.mcsl.hbotchamberapp.Controller.SensorData;
 
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -28,6 +32,22 @@ public class SensorService extends Service {
 
     private double temperature, humidity, flowRate, pressure, oxygen;
     private int co2Ppm;
+
+    private final IBinder binder = new LocalBinder();
+    private final MutableLiveData<SensorData> sensorDataLiveData = new MutableLiveData<>();
+
+    public class LocalBinder extends Binder {
+        public SensorService getService() {
+            return SensorService.this;
+        }
+    }
+
+
+    public LiveData<SensorData> getSensorData() {
+        return sensorDataLiveData;
+    }
+
+
 
     @Override
     public void onCreate() {
@@ -80,6 +100,9 @@ public class SensorService extends Service {
             sensorDataIntent.putExtra("oxygen", oxygen);
             sensorDataIntent.putExtra("co2Ppm", co2Ppm);
 
+            SensorData data = new SensorData(pressure, temperature, humidity, flowRate, oxygen, co2Ppm);
+            sensorDataLiveData.postValue(data);
+
             // 한 번에 브로드캐스트 전송
             LocalBroadcastManager.getInstance(this).sendBroadcast(sensorDataIntent);
         } catch (Exception e) {
@@ -92,6 +115,9 @@ public class SensorService extends Service {
             sensorDataIntent.putExtra("flowRate", -999);
             sensorDataIntent.putExtra("pressure", -999);
             sensorDataIntent.putExtra("oxygen", -999);
+
+            SensorData data = new SensorData(-999, -999, -999, -999, -999, -999);
+            sensorDataLiveData.postValue(data);
 
 
             LocalBroadcastManager.getInstance(this).sendBroadcast(sensorDataIntent);
@@ -170,6 +196,11 @@ public class SensorService extends Service {
     }
 
     @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "Sensor 서비스가 종료되었습니다.");
@@ -177,8 +208,7 @@ public class SensorService extends Service {
         handler.getLooper().quit();
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+
+
+
 }

@@ -20,19 +20,19 @@
 
         tools:targetApi="31">
         <service
-            android:name=".Sevice.PidService"
+            android:name=".Service.PidService"
             android:enabled="true"
             android:exported="true"></service>
         <service
-            android:name=".Sevice.GpioService"
+            android:name=".Service.GpioService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Sevice.ValveService"
+            android:name=".Service.ValveService"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Sevice.SensorService"
+            android:name=".Service.SensorService"
             android:enabled="true"
             android:exported="true" />
 

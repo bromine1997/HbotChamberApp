@@ -1,4 +1,4 @@
-package com.mcsl.hbotchamberapp.Sevice;
+package com.mcsl.hbotchamberapp.Service;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;

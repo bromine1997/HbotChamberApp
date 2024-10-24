@@ -1,4 +1,4 @@
-package com.mcsl.hbotchamberapp.Activity;
+package com.mcsl.hbotchamberapp.ViewModel;
 
 import android.content.Context;
 
