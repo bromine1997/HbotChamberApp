@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="32dp"
+    android:background="#2B2C3E"
     tools:context=".Activity.LoginActivity">
 
     <EditText
@@ -15,7 +17,11 @@
         android:layout_marginTop="48dp"
         android:hint="Username"
         android:inputType="textPersonName"
-        android:windowSoftInputMode="adjustResize" />
+        android:background="@drawable/input_background"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#A0A0A0"
+        android:padding="16dp"
+        android:textSize="24sp" />
 
     <EditText
         android:id="@+id/editTextPassword"
@@ -24,18 +30,20 @@
         android:layout_marginTop="16dp"
         android:hint="Password"
         android:inputType="textPassword"
-        android:windowSoftInputMode="adjustResize" />
+        android:background="@drawable/input_background"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#A0A0A0"
+        android:padding="16dp"
+        android:textSize="24sp" />
 
     <android.widget.Button
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginTop="28dp"
-        android:background="@drawable/round"
+        android:background="@drawable/button_background"
         android:text="로그인"
-        android:textColor="#ffffff"
-        android:textSize="34sp" />
-
-
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
 
 </LinearLayout>

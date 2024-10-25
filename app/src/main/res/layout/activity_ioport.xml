@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2B2C3E"
     tools:context=".Activity.IoPortActivity">
 
+    <!-- ScrollView for the main content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,12 +16,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
+            <!-- Left Side (Analog Inputs) -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -27,124 +30,128 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
                     android:text="Analog Input"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textSize="24sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
-
 
                 <!-- O2 -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="O2 (%)"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textColor="#A0A0A0"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/o2_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:background="@android:drawable/edit_text"
+                    android:padding="10dp"
                     android:text="0 %"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
-                    android:textSize="20sp" />
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
-
-
-                <!--   -->
+                <!-- CO2 -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CO2(%)"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:text="CO2 (%)"
+                    android:textColor="#A0A0A0"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/co2_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:background="@android:drawable/edit_text"
+                    android:padding="10dp"
                     android:text="0 %"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
-                    android:textSize="20sp" />
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
-
-
-                <!--   -->
+                <!-- Humidity -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Humidity (%)"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textColor="#A0A0A0"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/humidity_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:background="@android:drawable/edit_text"
+                    android:padding="10dp"
                     android:text="0 %"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
-                    android:textSize="20sp" />
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
-                <!--   -->
+                <!-- Temperature -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Temp (°C)"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textColor="#A0A0A0"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/temp_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:background="@android:drawable/edit_text"
+                    android:padding="10dp"
                     android:text="0 °C"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
-                    android:textSize="20sp" />
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
-                <!--   -->
+                <!-- Pressure -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pressure (ATA)"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:textColor="#A0A0A0"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/pressure_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:background="@android:drawable/edit_text"
+                    android:padding="10dp"
                     android:text="0 ATA"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
-                    android:textSize="20sp" />
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
-                <!--   -->
+                <!-- Flow -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="FLOW (lpm)"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
+                    android:text="Flow (lpm)"
+                    android:textColor="#A0A0A0"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/flow_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:background="@android:drawable/edit_text"
+                    android:padding="10dp"
                     android:text="0 lpm"
-                    android:textAppearance="?android:attr/textAppearanceListItem"
-                    android:textSize="20sp" />
-                <!--   -->
-
-
-                <!-- Add more controls for CO2, Humidity, Temp, Pressure, Flow -->
-
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
             </LinearLayout>
 
+            <!-- Right Side (Analog/Digital Outputs and Vent Control) -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -153,224 +160,193 @@
                 android:padding="16dp">
 
                 <TextView
-
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Analog, Digital Output"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:paddingBottom="8dp" />
 
-                <!-- Proportion (Press) -->
-
-
-                <!-- Proportion (Press) -->
+                <!-- Control Buttons (Sol Press) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="솔벨브(가압)"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textColor="#A0A0A0" />
 
-                <!-- Proportion (Press) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <android.widget.Button
                         android:id="@+id/control_Sol_PRESS_ON"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/round"
+                        android:layout_marginRight="40sp"
+                        android:background="@drawable/button_background"
                         android:text="ON"
-                        android:textColor="#ffffff"
-                        android:textSize="20sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
 
                     <android.widget.Button
                         android:id="@+id/control_Sol_PRESS_OFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/round"
+                        android:background="@drawable/button_background"
+                        android:backgroundTint="#FF0000"
                         android:text="OFF"
-                        android:textColor="#ffffff"
-                        android:textSize="20sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
                 </LinearLayout>
 
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="비례제어벨브(가압)"
-                    android:textSize="20sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal">
-
-                    <android.widget.Button
-                        android:id="@+id/Proportional_PRESS_ON"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/round"
-                        android:text="ON"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
-
-                    <android.widget.Button
-                        android:id="@+id/Proportional_PRESS_OFF"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/round"
-                        android:text="OFF"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
+                <!-- Proportion (Press) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Proportion (Press)"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textColor="#A0A0A0" />
 
-
-                <!-- Proportion (Press) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <android.widget.Button
                         android:id="@+id/controlProportionPressDown"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/round"
+                        android:layout_marginRight="40sp"
+                        android:background="@drawable/button_background"
                         android:text="Down"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
 
                     <android.widget.Button
                         android:id="@+id/controlProportionPressUP"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/round"
+                        android:background="@drawable/button_background"
                         android:text="UP"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
                 </LinearLayout>
 
+                <!-- Proportion Press Current Value (TextView) -->
+                <TextView
+                    android:id="@+id/proportion_press_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="16dp"
+                    android:textStyle="bold|italic"
+                    android:background="@android:drawable/edit_text"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="4 mA"
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
 
 
-                <!-- Proportion (Press) -->
+                <!-- Control Buttons (Sol Vent) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="솔벨브(감압)"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textColor="#A0A0A0" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <android.widget.Button
                         android:id="@+id/control_Sol_VENT_ON"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/round"
+                        android:layout_marginRight="40sp"
+                        android:background="@drawable/button_background"
                         android:text="ON"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
 
                     <android.widget.Button
                         android:id="@+id/control_Sol_VENT_OFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/round"
+                        android:background="@drawable/button_background"
+                        android:backgroundTint="#FF0000"
                         android:text="OFF"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="비례제어벨브(감압)"
-                    android:textSize="20sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal">
-
-                    <android.widget.Button
-                        android:id="@+id/Proportional_VENT_ON"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/round"
-                        android:text="ON"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
-
-                    <android.widget.Button
-                        android:id="@+id/Proportional_VENT_OFF"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/round"
-                        android:text="OFF"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-
+                <!-- Proportion (Vent) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Proportion (Vent)"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textColor="#A0A0A0" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <android.widget.Button
                         android:id="@+id/controlProportionVentDown"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/round"
+                        android:background="@drawable/button_background"
+                        android:layout_marginRight="40sp"
                         android:text="Down"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
 
                     <android.widget.Button
                         android:id="@+id/controlProportionVentUp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/round"
+                        android:background="@drawable/button_background"
                         android:text="UP"
-                        android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp" />
+
+
                 </LinearLayout>
+                <!-- Proportion Press Current Value (TextView) -->
 
-
+                <TextView
+                    android:id="@+id/proportion_vent_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="16dp"
+                    android:textStyle="bold|italic"
+                    android:background="@android:drawable/edit_text"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="4 mA"
+                    android:textColor="#000000"
+                    android:textSize="24sp" />
 
             </LinearLayout>
 
+            <!-- LED Buttons and Switch Status -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -378,6 +354,7 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- LED Control -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -389,31 +366,32 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/round"
-                        android:text="led1"
+                        android:background="@drawable/button_background"
+                        android:text="LED 1"
                         android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
 
                     <android.widget.Button
                         android:id="@+id/controlled2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/round"
-                        android:text="led2"
+                        android:background="@drawable/button_background"
+                        android:text="LED 2"
                         android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
 
                     <android.widget.Button
                         android:id="@+id/controlled3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/round"
-                        android:text="led3"
+                        android:background="@drawable/button_background"
+                        android:text="LED 3"
                         android:textColor="#ffffff"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
                 </LinearLayout>
 
+                <!-- Switch Status -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -425,87 +403,96 @@
                         android:id="@+id/switch1_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 1: OFF"
-                        android:textSize="20sp" />
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/switch2_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 2: OFF"
-                        android:textSize="20sp" />
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/switch3_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 3: OFF"
-                        android:textSize="20sp" />
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/switch4_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 4: OFF"
-                        android:textSize="20sp" />
-
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/switch5_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 5: OFF"
-                        android:textSize="20sp" />
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
 
                     <TextView
                         android:id="@+id/switch6_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 6: OFF"
-                        android:textSize="20sp" />
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
+
                     <TextView
                         android:id="@+id/switch7_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 7: OFF"
-                        android:textSize="20sp" />
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
+
                     <TextView
                         android:id="@+id/switch8_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@android:drawable/edit_text"
                         android:text="Switch 8: OFF"
-                        android:textSize="20sp" />
-
+                        android:textColor="#000000"
+                        android:textSize="24sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-
+    <!-- Exit Button -->
     <android.widget.Button
         android:id="@+id/exitButton"
-        android:layout_width="106dp"
-        android:layout_height="57dp"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/round"
+        android:background="@drawable/button_background"
         android:text="EXIT"
-        android:textColor="#ffffff"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

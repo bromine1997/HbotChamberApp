@@ -100,7 +100,7 @@ public class SensorService extends Service {
             sensorDataIntent.putExtra("oxygen", oxygen);
             sensorDataIntent.putExtra("co2Ppm", co2Ppm);
 
-            SensorData data = new SensorData(pressure, temperature, humidity, flowRate, oxygen, co2Ppm);
+            SensorData data = new SensorData(pressure, temperature, humidity, oxygen, co2Ppm, flowRate);
             sensorDataLiveData.postValue(data);
 
             // 한 번에 브로드캐스트 전송
@@ -207,8 +207,6 @@ public class SensorService extends Service {
         handler.removeCallbacks(sensorReadRunnable);
         handler.getLooper().quit();
     }
-
-
 
 
 }

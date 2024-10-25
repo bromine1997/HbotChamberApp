@@ -49,7 +49,7 @@ public class EditActivity extends AppCompatActivity {
     private ActivityEditBinding binding;
 
     private LineChart chart;
-    private Handler handler = new Handler(Looper.getMainLooper());
+
 
     private List<String[]> currentProfile = new ArrayList<>();
     private int currentSectionIndex = 0;

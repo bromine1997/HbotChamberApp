@@ -44,6 +44,15 @@ public class IoPortActivity extends AppCompatActivity {
             updateInputStatus(status);
         });
 
+        // **전류 값 관찰**
+        viewModel.getPressValveCurrent().observe(this, currentInMA -> {
+            binding.proportionPressValue.setText(String.format("%.2f mA", currentInMA));
+        });
+
+        viewModel.getVentValveCurrent().observe(this, currentInMA -> {
+            binding.proportionVentValue.setText(String.format("%.2f mA", currentInMA));
+        });
+
 
         initializeButtons();
         initializeValveButtons();

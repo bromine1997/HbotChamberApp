@@ -4,20 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2B2C3E"
     tools:context=".Activity.MenuActivity">
-
-    <!-- 첫 번째 줄의 버튼 -->
 
     <android.widget.Button
         android:id="@+id/runButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="100dp"
-        android:background="@drawable/round"
-        android:elevation="4dp"
+        android:background="@drawable/button_background"
+        android:elevation="6dp"
         android:text="RUN"
-        android:textColor="#ffffff"
-        android:textSize="48sp"
+        android:textColor="#FFFFFF"
+        android:textSize="50sp"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintEnd_toStartOf="@id/editButton"
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,17 +31,16 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="100dp"
         android:layout_marginEnd="4dp"
-        android:background="@drawable/round"
+        android:background="@drawable/button_background"
         android:text="EDIT"
-        android:textColor="#ffffff"
-        android:textSize="48sp"
+        android:textColor="#FFFFFF"
+        android:textSize="50sp"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintEnd_toStartOf="@id/ioportButton"
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintStart_toEndOf="@id/runButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.32" />
-
-    <!-- 두 번째 줄의 버튼 -->
 
     <android.widget.Button
         android:id="@+id/ioportButton"
@@ -50,16 +49,16 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="100dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/round"
+        android:background="@drawable/button_background"
         android:text="IOPORT"
-        android:textColor="#ffffff"
-        android:textSize="48sp"
+        android:textColor="#FFFFFF"
+        android:textSize="50sp"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintStart_toEndOf="@id/editButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.32" />
-
 
     <android.widget.Button
         android:id="@+id/exitButton"
@@ -67,16 +66,15 @@
         android:layout_height="0dp"
         android:layout_marginTop="208dp"
         android:layout_marginEnd="264dp"
-        android:background="@drawable/round"
+        android:background="@drawable/button_background"
         android:text="EXIT"
-        android:textColor="#ffffff"
-        android:textSize="48sp"
+        android:textColor="#FFFFFF"
+        android:textSize="50sp"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintTop_toBottomOf="@id/runButton"
         app:layout_constraintWidth_percent="0.48" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 

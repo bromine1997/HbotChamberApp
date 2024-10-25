@@ -59,6 +59,7 @@
             android:exported="false" />
         <activity
             android:name=".Activity.LoginActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true" />
     </application>
 

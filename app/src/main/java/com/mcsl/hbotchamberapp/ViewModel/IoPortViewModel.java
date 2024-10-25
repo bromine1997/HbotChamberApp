@@ -24,6 +24,9 @@ public class IoPortViewModel extends AndroidViewModel {
     private GpioRepository gpioRepository;
     private ValveRepository valveRepository;
 
+    private LiveData<Double> pressValveCurrent;
+    private LiveData<Double> ventValveCurrent;
+
     private LiveData<SensorData> sensorData;
     private LiveData<Byte> inputStatus;
 
@@ -35,6 +38,9 @@ public class IoPortViewModel extends AndroidViewModel {
 
         sensorData = sensorRepository.getSensorData();
         inputStatus = gpioRepository.getInputStatus();
+
+        pressValveCurrent = valveRepository.getPressValveCurrent();
+        ventValveCurrent = valveRepository.getVentValveCurrent();
     }
 
     public LiveData<SensorData> getSensorData() {
@@ -90,6 +96,14 @@ public class IoPortViewModel extends AndroidViewModel {
     }
     ////
 
+
+    public LiveData<Double> getPressValveCurrent() {
+        return pressValveCurrent;
+    }
+
+    public LiveData<Double> getVentValveCurrent() {
+        return ventValveCurrent;
+    }
 
     @Override
     protected void onCleared() {

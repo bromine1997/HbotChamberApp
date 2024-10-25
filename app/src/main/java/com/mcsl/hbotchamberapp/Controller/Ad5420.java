@@ -156,12 +156,17 @@ public class Ad5420 {
             // SPI로 데이터 전송
             spi1.write(Command_write);  // SPI 전송 후 자동으로 Latch가 내려감
 
+            pressCurrent = data & 0xFFFF; // 16비트 값 저장
+
         } else if (Channel == 1) {
             // 두 번째 칩을 업데이트할 때 (48비트 전송)
             Command_write = new byte[] {AD5420_DATA_REG_ADDR, command_Hdata, command_Ldata, 0, 0, 0};
 
             // SPI로 데이터 전송
             spi1.write(Command_write);  // SPI 전송 후 자동으로 Latch가 내려감
+
+
+            ventCurrent = data & 0xFFFF; // 16비트 값 저장
 
         } else {
             // 올바르지 않은 채널 번호일 때 (예외 처리)
@@ -223,6 +228,16 @@ public class Ad5420 {
             ventCurrent = 0;
         }
         DaisyCurrentWrite((char) 1,(short) ventCurrent);
+    }
+
+    // 현재 압력 밸브의 전류(mA)를 반환
+    public double getPressCurrentInMA() {
+        return 4.0 + ((pressCurrent / (double) DAC_MAX_VALUE) * 16.0);
+    }
+
+    // 현재 배기 밸브의 전류(mA)를 반환
+    public double getVentCurrentInMA() {
+        return 4.0 + ((ventCurrent / (double) DAC_MAX_VALUE) * 16.0);
     }
 
 }

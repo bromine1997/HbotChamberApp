@@ -8,11 +8,18 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.mcsl.hbotchamberapp.Controller.Ad5420;
 import com.mcsl.hbotchamberapp.Controller.PinController;
 
 public class ValveService extends Service {
     private static final String TAG = "ValveService";
+
+
+    private MutableLiveData<Double> pressValveCurrentLiveData = new MutableLiveData<>();
+    private MutableLiveData<Double> ventValveCurrentLiveData = new MutableLiveData<>();
 
 
     private PinController pinController;
@@ -24,6 +31,14 @@ public class ValveService extends Service {
         public ValveService getService() {
             return ValveService.this;
         }
+    }
+
+    public LiveData<Double> getPressValveCurrentLiveData() {
+        return pressValveCurrentLiveData;
+    }
+
+    public LiveData<Double> getVentValveCurrentLiveData() {
+        return ventValveCurrentLiveData;
     }
 
 
@@ -88,10 +103,14 @@ public class ValveService extends Service {
 
     public void pressValveUp() {
         ad5420.PressValveCurrentUp();
+        double currentInMA = ad5420.getPressCurrentInMA();
+        pressValveCurrentLiveData.postValue(currentInMA);
     }
 
     public void pressValveDown() {
         ad5420.PressValveCurrentDown();
+        double currentInMA = ad5420.getPressCurrentInMA();
+        pressValveCurrentLiveData.postValue(currentInMA);
     }
 
 
@@ -105,10 +124,16 @@ public class ValveService extends Service {
 
     public void ventValveUp() {
         ad5420.VentValveCurrentUp();
+        double currentInMA = ad5420.getPressCurrentInMA();
+        ventValveCurrentLiveData.postValue(currentInMA);
+
     }
 
     public void ventValveDown() {
         ad5420.VentValveCurrentDown();
+        double currentInMA = ad5420.getVentCurrentInMA();
+        ventValveCurrentLiveData.postValue(currentInMA);
+
     }
 
 

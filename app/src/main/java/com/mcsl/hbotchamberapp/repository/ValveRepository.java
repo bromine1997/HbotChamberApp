@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.mcsl.hbotchamberapp.Service.ValveService;
 
 public class ValveRepository {
@@ -94,6 +97,22 @@ public class ValveRepository {
     public void ventValveDown() {
         if (isServiceBound) {
             valveService.ventValveDown();
+        }
+    }
+
+    public LiveData<Double> getPressValveCurrent() {
+        if (isServiceBound && valveService != null) {
+            return valveService.getPressValveCurrentLiveData();
+        } else {
+            return new MutableLiveData<>(4.0); // 기본값 4mA
+        }
+    }
+
+    public LiveData<Double> getVentValveCurrent() {
+        if (isServiceBound && valveService != null) {
+            return valveService.getVentValveCurrentLiveData();
+        } else {
+            return new MutableLiveData<>(4.0); // 기본값 4mA
         }
     }
 
