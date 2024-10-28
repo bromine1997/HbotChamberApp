@@ -124,7 +124,7 @@ public class ValveService extends Service {
 
     public void ventValveUp() {
         ad5420.VentValveCurrentUp();
-        double currentInMA = ad5420.getPressCurrentInMA();
+        double currentInMA = ad5420.getVentCurrentInMA();
         ventValveCurrentLiveData.postValue(currentInMA);
 
     }

@@ -60,20 +60,7 @@ public class IoPortActivity extends AppCompatActivity {
 
 
 
-    private BroadcastReceiver ioStatusReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            byte inputStatus = intent.getByteExtra("inputStatus", (byte) 0);
-            updateTextViewStatus(inputStatus, binding.switch1Status, 0);
-            updateTextViewStatus(inputStatus, binding.switch2Status, 1);
-            updateTextViewStatus(inputStatus, binding.switch3Status, 2);
-            updateTextViewStatus(inputStatus, binding.switch4Status, 3);
-            updateTextViewStatus(inputStatus, binding.switch5Status, 4);
-            updateTextViewStatus(inputStatus, binding.switch6Status, 5);
-            updateTextViewStatus(inputStatus, binding.switch7Status, 6);
-            updateTextViewStatus(inputStatus, binding.switch8Status, 7);
-        }
-    };
+
 
     private void initializeButtons() {
         binding.controlled1.setOnClickListener(v -> viewModel.toggleLed(1));

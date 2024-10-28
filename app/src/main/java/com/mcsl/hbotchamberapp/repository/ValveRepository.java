@@ -10,6 +10,7 @@ import android.os.IBinder;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.mcsl.hbotchamberapp.Service.ValveService;
 
@@ -18,6 +19,9 @@ public class ValveRepository {
     private ValveService valveService;
     private boolean isServiceBound = false;
     private Context context;
+
+    private MutableLiveData<Double> pressValveCurrentLiveData = new MutableLiveData<>(4.0);
+    private MutableLiveData<Double> ventValveCurrentLiveData = new MutableLiveData<>(4.0);
 
     private ValveRepository(Context context) {
         this.context = context.getApplicationContext();
@@ -42,11 +46,33 @@ public class ValveRepository {
             ValveService.LocalBinder binder = (ValveService.LocalBinder) service;
             valveService = binder.getService();
             isServiceBound = true;
+
+            valveService.getPressValveCurrentLiveData().observeForever(pressValveCurrentObserver);
+            valveService.getVentValveCurrentLiveData().observeForever(ventValveCurrentObserver);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             isServiceBound = false;
+            if (valveService != null) {
+                valveService.getPressValveCurrentLiveData().removeObserver(pressValveCurrentObserver);
+                valveService.getVentValveCurrentLiveData().removeObserver(ventValveCurrentObserver);
+            }
+            valveService = null;
+        }
+    };
+
+    private Observer<Double> pressValveCurrentObserver = new Observer<Double>() {
+        @Override
+        public void onChanged(Double value) {
+            pressValveCurrentLiveData.postValue(value);
+        }
+    };
+
+    private Observer<Double> ventValveCurrentObserver = new Observer<Double>() {
+        @Override
+        public void onChanged(Double value) {
+            ventValveCurrentLiveData.postValue(value);
         }
     };
 
@@ -101,25 +127,21 @@ public class ValveRepository {
     }
 
     public LiveData<Double> getPressValveCurrent() {
-        if (isServiceBound && valveService != null) {
-            return valveService.getPressValveCurrentLiveData();
-        } else {
-            return new MutableLiveData<>(4.0); // 기본값 4mA
-        }
+        return pressValveCurrentLiveData;
     }
 
     public LiveData<Double> getVentValveCurrent() {
-        if (isServiceBound && valveService != null) {
-            return valveService.getVentValveCurrentLiveData();
-        } else {
-            return new MutableLiveData<>(4.0); // 기본값 4mA
-        }
+        return ventValveCurrentLiveData;
     }
 
     // 나머지 밸브 제어 메소드들도 추가
 
     public void unbindService() {
         if (isServiceBound) {
+            if (valveService != null) {
+                valveService.getPressValveCurrentLiveData().removeObserver(pressValveCurrentObserver);
+                valveService.getVentValveCurrentLiveData().removeObserver(ventValveCurrentObserver);
+            }
             context.unbindService(serviceConnection);
             isServiceBound = false;
         }

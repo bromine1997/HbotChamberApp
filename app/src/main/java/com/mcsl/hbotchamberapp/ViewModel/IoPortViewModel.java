@@ -62,18 +62,19 @@ public class IoPortViewModel extends AndroidViewModel {
     public void solPressOn() {
         valveRepository.solPressOn();
     }
-
     public void solPressOff() {
         valveRepository.solPressOff();
     }
 
+
+
     // 배기 Sol 벨브 제어
     public void solVentOn() {
-        valveRepository.solPressOn();
+        valveRepository.solVentOn();
     }
 
     public void solVentOff() {
-        valveRepository.solPressOff();
+        valveRepository.solVentOff();
     }
 
     //가압 비례제어벨브
