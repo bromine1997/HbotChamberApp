@@ -109,8 +109,6 @@ public class IoPortViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        sensorRepository.unbindService();
-        gpioRepository.unbindService();
-        valveRepository.unbindService();
+
     }
 }

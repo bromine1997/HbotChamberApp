@@ -59,40 +59,6 @@ public class ValveService extends Service {
     }
 
 
-    private BroadcastReceiver pressPidOutputReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ("com.mcsl.hbotchamberapp.PRESS_VALVE_CONTROL".equals(intent.getAction())) {
-                double pidOutput = intent.getDoubleExtra("pidOutput", 0.0);
-                Log.d(TAG, "Received PID output: " + pidOutput);
-                // PID 출력 값을 이용해 비례제어 밸브를 제어하는 로직을 추가
-                PidControlPressProportionValve(pidOutput);
-            }
-        }
-    };
-
-    private BroadcastReceiver ventPidOutputReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ("com.mcsl.hbotchamberapp.VENT_VALVE_CONTROL".equals(intent.getAction())) {
-                double pidOutput = intent.getDoubleExtra("pidOutput", 0.0);
-                Log.d(TAG, "Received PID output: " + pidOutput);
-                // PID 출력 값을 이용해 비례제어 밸브를 제어하는 로직을 추가
-                PidControlVentProportionValve(pidOutput);
-            }
-        }
-    };
-
-    private BroadcastReceiver stopAllValvesReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ("com.mcsl.hbotchamberapp.STOP_ALL_VALVES".equals(intent.getAction())) {
-                // 모든 벨브를 끄는 로직
-                stopAllValves();
-            }
-        }
-    };
-
     public void solPressOn() {
         pinController.Sol_OUPUT(0, 1);
     }
@@ -138,10 +104,7 @@ public class ValveService extends Service {
 
 
 
-
-
-
-    private void PidControlPressProportionValve(double pidOutput) {
+    public void PidControlPressProportionValve(double pidOutput) {
 
         pinController.Sol_OUPUT(0, 1);          // 가압 솔 벨브 on
         pinController.Sol_OUPUT(1, 0);          // 배기 솔 벨브 off
@@ -160,7 +123,7 @@ public class ValveService extends Service {
 
     }
 
-    private void PidControlVentProportionValve(double pidOutput) {
+    public void PidControlVentProportionValve(double pidOutput) {
 
         pinController.Sol_OUPUT(0, 0);          // 가압 솔 벨브 off
         pinController.Sol_OUPUT(1, 1);          // 배기 솔 벨브 on
@@ -180,7 +143,7 @@ public class ValveService extends Service {
     }
 
 
-    private void stopAllValves() {
+    public void stopAllValves() {
         // 모든 벨브를 끄는 로직 구현
         pinController.Sol_OUPUT(0, 0);  // 가압 솔 벨브 OFF
         pinController.Sol_OUPUT(1, 0);  // 배기 솔 벨브 OFF

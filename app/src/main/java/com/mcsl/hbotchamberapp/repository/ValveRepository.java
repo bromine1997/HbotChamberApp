@@ -54,11 +54,8 @@ public class ValveRepository {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             isServiceBound = false;
-            if (valveService != null) {
-                valveService.getPressValveCurrentLiveData().removeObserver(pressValveCurrentObserver);
-                valveService.getVentValveCurrentLiveData().removeObserver(ventValveCurrentObserver);
-            }
-            valveService = null;
+            valveService.getPressValveCurrentLiveData().removeObserver(pressValveCurrentObserver);
+            valveService.getVentValveCurrentLiveData().removeObserver(ventValveCurrentObserver);
         }
     };
 
@@ -79,23 +76,27 @@ public class ValveRepository {
     // 밸브 제어 메소드들
 
     public void solPressOn() {
+
         if (isServiceBound) {
             valveService.solPressOn();
         }
     }
     public void solPressOff() {
+
         if (isServiceBound) {
             valveService.solPressOff();
         }
     }
 
     public void pressValveUp() {
+
         if (isServiceBound) {
             valveService.pressValveUp();
         }
     }
 
     public void pressValveDown() {
+
         if (isServiceBound) {
             valveService.pressValveDown();
         }
@@ -104,27 +105,33 @@ public class ValveRepository {
     // 밸브 제어 메소드들
 
     public void solVentOn() {
+
         if (isServiceBound) {
             valveService.solVentOn();
         }
     }
     public void solVentOff() {
+
         if (isServiceBound) {
             valveService.solVentOff();
         }
     }
 
     public void ventValveUp() {
+
         if (isServiceBound) {
             valveService.ventValveUp();
         }
     }
 
     public void ventValveDown() {
+
         if (isServiceBound) {
             valveService.ventValveDown();
         }
     }
+
+
 
     public LiveData<Double> getPressValveCurrent() {
         return pressValveCurrentLiveData;
@@ -138,10 +145,6 @@ public class ValveRepository {
 
     public void unbindService() {
         if (isServiceBound) {
-            if (valveService != null) {
-                valveService.getPressValveCurrentLiveData().removeObserver(pressValveCurrentObserver);
-                valveService.getVentValveCurrentLiveData().removeObserver(ventValveCurrentObserver);
-            }
             context.unbindService(serviceConnection);
             isServiceBound = false;
         }
