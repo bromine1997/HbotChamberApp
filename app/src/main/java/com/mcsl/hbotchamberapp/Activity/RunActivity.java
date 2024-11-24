@@ -1,12 +1,16 @@
 package com.mcsl.hbotchamberapp.Activity;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.mcsl.hbotchamberapp.ViewModel.RunViewModel;
 import com.mcsl.hbotchamberapp.databinding.ActivityRunBinding;
+import com.mcsl.hbotchamberapp.model.PIDState;
 import com.mcsl.hbotchamberapp.util.ChartManager;
 
 public class RunActivity extends AppCompatActivity {
@@ -34,28 +38,22 @@ public class RunActivity extends AppCompatActivity {
         viewModel.loadProfileData(this);
 
         // Run button click event
-        binding.btnRun.setOnClickListener(v -> {
-            viewModel.startPidControl();
-            isRunning = true;
-        });
+        binding.btnRun.setOnClickListener(v -> viewModel.startPidControl());
 
-        binding.btnEnd.setOnClickListener(v -> {
-            viewModel.stopPidControl();
-            isRunning = false;
-        });
+        // End button click event
+        binding.btnEnd.setOnClickListener(v -> viewModel.stopPidControl());
 
-        // Pause button click event
+
+        // Pause/Resume button click event
         binding.btnPause.setOnClickListener(v -> {
-            if (isPaused) {
-                viewModel.resumePidControl();
-                isPaused = false;
-                binding.btnPause.setText("Pause");
-            } else {
+            PIDState currentState = viewModel.getPidState().getValue();
+            if (currentState == PIDState.RUNNING || currentState == PIDState.STARTED) {
                 viewModel.pausePidControl();
-                isPaused = true;
-                binding.btnPause.setText("Resume");
+            } else if (currentState == PIDState.PAUSED) {
+                viewModel.resumePidControl();
             }
         });
+
     }
 
 
@@ -63,16 +61,24 @@ public class RunActivity extends AppCompatActivity {
     private void setupObservers() {
         // Observe profile data
         viewModel.getProfileData().observe(this, data -> {
-            chartManager.updateProfileChart(data);
+            if (data != null && !data.isEmpty()) {
+                chartManager.updateProfileChart(data);
+                Log.d(TAG, "Profile data updated.");
+            } else {
+                Log.d(TAG, "Profile data is empty.");
+            }
         });
+
 
         // Observe sensor data
         viewModel.getSensorData().observe(this, sensorData -> {
-            if (isRunning && !isPaused) {
+            PIDState currentState = viewModel.getPidState().getValue();
+            if (currentState == PIDState.STARTED || currentState == PIDState.RUNNING) {
                 long elapsedTime = viewModel.getElapsedTime().getValue() != null
                         ? viewModel.getElapsedTime().getValue()
                         : 0;
                 chartManager.updatePressureChart(sensorData.getPressure(), elapsedTime);
+                Log.d(TAG, "Pressure data updated.");
             }
             updateChamberPressure(sensorData.getPressure());
         });
@@ -88,11 +94,33 @@ public class RunActivity extends AppCompatActivity {
             binding.setPointPressure.setText(setPointText);
         });
 
-        // Observe pidPhase
+        // Observe PID 상태
+
+        // Observe PID 상태
+        viewModel.getPidState().observe(this, pidState -> {
+            Log.d(TAG, "RunActivity: Observed PID state: " + pidState);
+            switch (pidState) {
+                case STARTED:
+                case RUNNING:
+                    binding.btnRun.setEnabled(false);
+                    binding.btnPause.setEnabled(true);
+                    binding.btnEnd.setEnabled(true);
+                    binding.btnPause.setText("Pause");
+                    break;
+                case PAUSED:
+                    binding.btnPause.setText("Resume");
+                    break;
+                case STOPPED:
+                    binding.btnRun.setEnabled(true);
+                    binding.btnPause.setEnabled(false);
+                    binding.btnEnd.setEnabled(false);
+                    binding.btnPause.setText("Pause");
+                    break;
+            }
+            // 추가적인 UI 업데이트 로직이 필요하면 여기에 작성
+        });
 
     }
-
-
 
     private void updateChamberPressure(double pressure) {
         String pressureText = String.format("%.2f ATA", pressure);

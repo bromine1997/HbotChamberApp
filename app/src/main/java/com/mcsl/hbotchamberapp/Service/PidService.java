@@ -8,14 +8,13 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.util.UUID;
-
 import androidx.lifecycle.Observer;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.mcsl.hbotchamberapp.Controller.Pid;
 import com.mcsl.hbotchamberapp.model.SensorData;
+import com.mcsl.hbotchamberapp.model.PIDState;
 import com.mcsl.hbotchamberapp.repository.PIDRepository;
 import com.mcsl.hbotchamberapp.repository.SensorRepository;
 
@@ -23,16 +22,15 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-
 import java.util.concurrent.TimeUnit;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.google.gson.reflect.TypeToken;
 
 public class PidService extends Service {
     private static final String TAG = "PIDService";
@@ -88,8 +86,6 @@ public class PidService extends Service {
         ventPidController = new Pid(15.0,10.00,0.1);
         ventPidController.setDirection(true);
 
-
-
         // ValveService 바인딩
         Intent intent = new Intent(this, ValveService.class);
         bindService(intent, valveServiceConnection, Context.BIND_AUTO_CREATE);
@@ -102,17 +98,20 @@ public class PidService extends Service {
         }
     };
 
-    private void startPIDControl(List<String[]> profileData) {
-
-        String sessionId = UUID.randomUUID().toString();
-        pidRepository.setSessionId(sessionId);
-
-
-        if (startTime == 0) {
+    private void startPIDControl(List<String[]> profileData, boolean isStart) {
+        if (isStart) {
+            String sessionId = UUID.randomUUID().toString();
+            pidRepository.setSessionId(sessionId);
             startTime = System.currentTimeMillis();
+            totalPausedDuration = 0;
+            isPaused = false;
+        } else {
+            // RESUME의 경우 startTime과 totalPausedDuration을 유지
+            startTime = System.currentTimeMillis() - elapsedTime;
         }
 
-        sendPidControlStatusBroadcast("PID_CONTROL_STARTED");
+        pidRepository.setPidState(isStart ? PIDState.STARTED : PIDState.RUNNING); // 상태 업데이트
+        sendPidControlStatusBroadcast(isStart ? "PID_CONTROL_STARTED" : "PID_CONTROL_RESUMED");
 
         final long totalProfileTime = calculateTotalProfileTime(profileData);
         Log.d(TAG, "총 프로파일 시간: " + totalProfileTime + "ms");
@@ -209,19 +208,36 @@ public class PidService extends Service {
     private void stopPIDControl() {
         if (scheduler != null) {
             scheduler.shutdown();
-            scheduler = null;         // 스케줄러를 null로 설정합니다.
+            scheduler = null; // 스케줄러를 null로 설정합니다.
         }
+
+        pidRepository.setPidState(PIDState.STOPPED); // 상태 업데이트
+        pidRepository.setSessionId(null);
 
         startTime = 0;
         totalPausedDuration = 0;
         isPaused = false;
 
-        pidRepository.setSessionId(null);
-
         sendPidControlStatusBroadcast("PID_CONTROL_STOPPED");
 
         if (isValveServiceBound) {
             valveService.stopAllValves();
+        }
+    }
+
+    private void pausePIDControl() {
+        isPaused = true;
+        pauseStartTime = System.currentTimeMillis();
+        pidRepository.setPidState(PIDState.PAUSED); // 상태 업데이트
+        sendPidControlStatusBroadcast("PID_CONTROL_PAUSED");
+    }
+
+    private void resumePIDControl() {
+        if (isPaused) {
+            totalPausedDuration += System.currentTimeMillis() - pauseStartTime;
+            isPaused = false;
+            pidRepository.setPidState(PIDState.RUNNING); // 상태 업데이트
+            sendPidControlStatusBroadcast("PID_CONTROL_RESUMED");
         }
     }
 
@@ -234,21 +250,17 @@ public class PidService extends Service {
                     case "com.mcsl.hbotchamberapp.action.START_PID":
                         profileData = loadProfileData();
                         if (profileData != null && !profileData.isEmpty()) {
-                            startPIDControl(profileData);
+                            startPIDControl(profileData, true); // START
                         }
                         break;
                     case "com.mcsl.hbotchamberapp.action.PAUSE_PID":
-                        isPaused = true;
-                        pauseStartTime = System.currentTimeMillis();
+                        pausePIDControl(); // PAUSE
                         break;
                     case "com.mcsl.hbotchamberapp.action.RESUME_PID":
-                        if (isPaused) {
-                            totalPausedDuration += System.currentTimeMillis() - pauseStartTime;
-                            isPaused = false;
-                        }
+                        resumePIDControl(); // RESUME
                         break;
                     case "com.mcsl.hbotchamberapp.action.STOP_PID":
-                        stopPIDControl();
+                        stopPIDControl(); // STOP
                         stopSelf();
                         break;
                 }
@@ -290,7 +302,6 @@ public class PidService extends Service {
         Intent intent = new Intent(action);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
 
     @Override
     public void onDestroy() {

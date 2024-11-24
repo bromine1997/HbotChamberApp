@@ -61,7 +61,7 @@ public class ChartManager {
 
         for (ProfileSection section : data) {
             profileDataSet.addEntry(new Entry(currentTime, section.getStartPressure()));
-            currentTime += section.getDuration() * 60; // Convert minutes to seconds
+            currentTime += section.getDuration();
             profileDataSet.addEntry(new Entry(currentTime, section.getEndPressure()));
         }
 
@@ -71,7 +71,7 @@ public class ChartManager {
     }
 
     public void updatePressureChart(double pressure, long elapsedTime) {
-        float currentTime = elapsedTime / 1000f;  // Convert milliseconds to seconds
+        float currentTime = elapsedTime / (1000f * 60f);  // 밀리초를 분으로 변환
         pressureDataSet.addEntry(new Entry(currentTime, (float) pressure));
         lineData.notifyDataChanged();
         chart.notifyDataSetChanged();

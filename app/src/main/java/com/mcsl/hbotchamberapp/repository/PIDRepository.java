@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.mcsl.hbotchamberapp.Service.PidService;
+import com.mcsl.hbotchamberapp.model.PIDState;
 
 public class PIDRepository {
     private static PIDRepository instance;
@@ -20,7 +21,8 @@ public class PIDRepository {
     private MutableLiveData<String> sessionId = new MutableLiveData<>();
 
 
-    private MutableLiveData<Boolean> pidControlRunning = new MutableLiveData<>(false);
+    private MutableLiveData<PIDState> pidState = new MutableLiveData<>(PIDState.STOPPED);   //PID 상태 관리 변수 Enum으로 관리
+
 
     private PIDRepository(Context context) {
         this.context = context.getApplicationContext();
@@ -33,8 +35,12 @@ public class PIDRepository {
         return instance;
     }
 
-    public LiveData<Boolean> isPidControlRunning() {
-        return pidControlRunning;
+    public LiveData<PIDState> getPidState() {
+        return pidState;
+    }
+
+    public void setPidState(PIDState state) {
+        pidState.postValue(state);
     }
 
     public LiveData<Long> getElapsedTime() {
@@ -80,7 +86,7 @@ public class PIDRepository {
         Intent pidIntent = new Intent(context, PidService.class);
         pidIntent.setAction("com.mcsl.hbotchamberapp.action.START_PID");
         context.startService(pidIntent);
-        pidControlRunning.postValue(true); // PID 제어 시작 상태 업데이트
+        setPidState(PIDState.STARTED); // PID 상태 업데이트
 
     }
 
@@ -88,7 +94,7 @@ public class PIDRepository {
         Intent pauseIntent = new Intent(context, PidService.class);
         pauseIntent.setAction("com.mcsl.hbotchamberapp.action.PAUSE_PID");
         context.startService(pauseIntent);
-
+        setPidState(PIDState.PAUSED); // PID 상태 업데이트
         sendPidControlBroadcast("PID_CONTROL_PAUSED");
     }
 
@@ -96,7 +102,7 @@ public class PIDRepository {
         Intent resumeIntent = new Intent(context, PidService.class);
         resumeIntent.setAction("com.mcsl.hbotchamberapp.action.RESUME_PID");
         context.startService(resumeIntent);
-
+        setPidState(PIDState.RUNNING); // PID 상태 업데이트
         // PID_CONTROL_RESUMED Broadcast 전송
         sendPidControlBroadcast("PID_CONTROL_RESUMED");
     }
@@ -105,7 +111,7 @@ public class PIDRepository {
         Intent stopIntent = new Intent(context, PidService.class);
         stopIntent.setAction("com.mcsl.hbotchamberapp.action.STOP_PID");
         context.startService(stopIntent);
-        pidControlRunning.postValue(false); // PID 제어 종료 상태 업데이트
+        setPidState(PIDState.STOPPED); // PID 상태 업데이트
 
 
     }

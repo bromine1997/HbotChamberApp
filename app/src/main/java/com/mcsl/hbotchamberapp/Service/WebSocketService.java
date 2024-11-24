@@ -17,6 +17,7 @@ import com.google.gson.JsonSyntaxException;
 import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.model.SensorDataPacket;
 import com.mcsl.hbotchamberapp.model.ServerCommand;
+import com.mcsl.hbotchamberapp.model.PIDState;
 import com.mcsl.hbotchamberapp.repository.PIDRepository;
 import com.mcsl.hbotchamberapp.repository.SensorRepository;
 
@@ -32,10 +33,6 @@ import java.util.concurrent.Executors;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-
-
-// WebSocketService.java
-import androidx.lifecycle.Observer;
 
 public class WebSocketService extends Service {
     private static final String TAG = "WebSocketService";
@@ -54,14 +51,12 @@ public class WebSocketService extends Service {
     private long elapsedTimeValue = 0L;
     private double setPointValue = 0.0;
 
-
     private String sessionId = null;
     private String userId = null; // userId 필드 추가
 
     @Override
     public void onCreate() {
         super.onCreate();
-
 
         sensorRepository = SensorRepository.getInstance(this);
         pidRepository = PIDRepository.getInstance(this);
@@ -108,8 +103,6 @@ public class WebSocketService extends Service {
 
         executorService = Executors.newSingleThreadExecutor();
     }
-
-
 
     private Emitter.Listener onConnect = new Emitter.Listener() {
         @Override
@@ -161,10 +154,19 @@ public class WebSocketService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if ("PID_CONTROL_STARTED".equals(action) || "PID_CONTROL_RESUMED".equals(action)) {
+            Log.d(TAG, "Received broadcast: " + action);
+            if ("PID_CONTROL_STARTED".equals(action)) {
                 startSendingSensorData();
-            }  else if ("PID_CONTROL_STOPPED".equals(action) || "PID_CONTROL_PAUSED".equals(action)) {
+                pidRepository.setPidState(PIDState.STARTED);
+            } else if ("PID_CONTROL_PAUSED".equals(action)) {
                 stopSendingSensorData();
+                pidRepository.setPidState(PIDState.PAUSED);
+            } else if ("PID_CONTROL_RESUMED".equals(action)) {
+                startSendingSensorData();
+                pidRepository.setPidState(PIDState.RUNNING);
+            } else if ("PID_CONTROL_STOPPED".equals(action)) {
+                stopSendingSensorData();
+                pidRepository.setPidState(PIDState.STOPPED);
             }
         }
     };
@@ -187,13 +189,11 @@ public class WebSocketService extends Service {
         }
     }
 
-
-
     // sensorDataObserver 수정
     private final Observer<SensorData> sensorDataObserver = new Observer<SensorData>() {
         @Override
         public void onChanged(SensorData data) {
-            if (data != null && sessionId != null) { // sessionId가 null이 아닌 경우에만 전송
+            if (data != null && sessionId != null && (pidRepository.getPidState().getValue() == PIDState.STARTED || pidRepository.getPidState().getValue() == PIDState.RUNNING)) { // STARTED 또는 RUNNING 상태일 때만 전송
                 executorService.execute(() -> {
                     String deviceId = "chamber 1"; // deviceId는 하드코딩 또는 설정값 사용
                     SensorDataPacket packet = new SensorDataPacket(deviceId, sessionId, userId, data, elapsedTimeValue, setPointValue);
@@ -212,6 +212,7 @@ public class WebSocketService extends Service {
             }
         }
     };
+
     private final Observer<Long> elapsedTimeObserver = new Observer<Long>() {
         @Override
         public void onChanged(Long value) {
@@ -230,21 +231,22 @@ public class WebSocketService extends Service {
         try {
             ServerCommand command = gson.fromJson(message, ServerCommand.class);
             if (command != null) {
+                Log.d(TAG, "Received server command: " + command.getAction());
                 switch (command.getAction()) {
                     case "START":
-                        pidRepository.startPidControl();
+                        pidRepository.startPidControl(); // START
                         break;
                     case "PAUSE":
-                        pidRepository.pausePidControl();
+                        pidRepository.pausePidControl(); // PAUSE
                         break;
                     case "RESUME":
-                        pidRepository.resumePidControl();
+                        pidRepository.resumePidControl(); // RESUME
                         break;
                     case "STOP":
-                        pidRepository.stopPidControl();
+                        pidRepository.stopPidControl(); // STOP
                         break;
                     default:
-                        Log.d(TAG, "Unknown command received");
+                        Log.d(TAG, "Unknown command received: " + command.getAction());
                         break;
                 }
             }
@@ -283,7 +285,6 @@ public class WebSocketService extends Service {
         SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         return sharedPreferences.getString("username", null);  // 저장된 사용자 이름 반환
     }
-
 
     @Override
     public void onDestroy() {

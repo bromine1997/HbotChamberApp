@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.mcsl.hbotchamberapp.model.PIDState;
 import com.mcsl.hbotchamberapp.model.ProfileSection;
 import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.repository.ProfileRepository;
@@ -22,7 +23,7 @@ public class RunViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> pidControlRunning = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isWebSocketConnected = new MutableLiveData<>(false);
 
-    private LiveData<Boolean> pidControlRunningServer; // 서버에서 시작한 PID 제어 상태
+    private LiveData<PIDState> pidState; // PID 상태 LiveData
 
     private PIDRepository pidRepository;
     private SensorRepository sensorRepository;
@@ -45,6 +46,8 @@ public class RunViewModel extends AndroidViewModel {
         sensorData = sensorRepository.getSensorData();
         setPoint = pidRepository.getSetPoint();
         pidPhase = pidRepository.getPidPhase();
+
+        pidState = pidRepository.getPidState(); // PID 상태 LiveData 연결
     }
 
     public void loadProfileData(Context context) {
@@ -78,6 +81,12 @@ public class RunViewModel extends AndroidViewModel {
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
+
+    public LiveData<PIDState> getPidState() {
+        return pidState;
+    }
+
+
 
     public LiveData<SensorData> getSensorData() {
         return sensorData;
