@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.mcsl.hbotchamberapp.BuildConfig;
 import com.mcsl.hbotchamberapp.databinding.ActivityLoginBinding;
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
@@ -25,7 +27,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private OkHttpClient client;
-    private static final String LOGIN_URL = "http://192.168.0.125:8080/auth/login"; // 서버 주소 설정
+
+    private static final String LOGIN_URL = "http://" + BuildConfig.SERVER_ADDRESS+"/auth/login";
+    //private static final String LOGIN_URL = "http://192.168.0.125:8080/auth/login"; // 서버 주소 설정
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     @Override

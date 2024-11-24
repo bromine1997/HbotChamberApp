@@ -2,18 +2,11 @@ package com.mcsl.hbotchamberapp.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 
-import com.mcsl.hbotchamberapp.Service.PidService;
 import com.mcsl.hbotchamberapp.ViewModel.RunViewModel;
 import com.mcsl.hbotchamberapp.databinding.ActivityRunBinding;
-import com.mcsl.hbotchamberapp.Controller.SensorData;
 import com.mcsl.hbotchamberapp.util.ChartManager;
 
 public class RunActivity extends AppCompatActivity {

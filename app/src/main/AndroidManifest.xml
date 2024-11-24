@@ -35,6 +35,9 @@
             android:name=".Service.SensorService"
             android:enabled="true"
             android:exported="true" />
+        <service android:name=".Service.WebSocketService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity
             android:name=".Activity.SplashActivity"

@@ -26,6 +26,7 @@ import com.google.gson.reflect.TypeToken;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.mcsl.hbotchamberapp.BuildConfig;
 import com.mcsl.hbotchamberapp.R;
 import com.mcsl.hbotchamberapp.databinding.ActivityEditBinding;
 import com.mcsl.hbotchamberapp.model.ProfileSection;
@@ -51,7 +52,8 @@ public class EditActivity extends AppCompatActivity {
 
     private List<String[]> currentProfile = new ArrayList<>();
     private int currentSectionIndex = 0;
-    private static final String PROFILE_SAVE_URL = "http://192.168.0.125:8080/profile/save"; // 프로파일 저장 API URL
+
+    private static final String PROFILE_SAVE_URL = "http://" + BuildConfig.SERVER_ADDRESS+"/profile/save";
     private OkHttpClient client;
 
     @Override
@@ -246,8 +248,19 @@ public class EditActivity extends AppCompatActivity {
         // currentProfile을 ProfileSection 리스트로 변환
         List<ProfileSection> profileSections = convertToProfileSections(currentProfile);
 
-        // ProfileRequest 객체 생성
-        ProfileRequest profileRequest = new ProfileRequest(profileSections);
+
+        // 사용자 ID를 가져옵니다.
+        String userId = getUserId();
+
+        // 프로파일 이름 설정 (예: 사용자 입력 또는 기본값)
+        String profileName = "My Profile"; // 필요에 따라 수정
+
+        if (userId == null) {
+            Toast.makeText(this, "사용자 ID를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // ProfileRequest 객체 생성 (userId 포함)
+        ProfileRequest profileRequest = new ProfileRequest(userId, profileName, profileSections);
 
         // Retrofit을 통해 ApiService 생성
         ApiService apiService = ApiClient.getClient().create(ApiService.class);

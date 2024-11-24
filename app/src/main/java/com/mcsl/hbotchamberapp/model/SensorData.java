@@ -1,4 +1,4 @@
-package com.mcsl.hbotchamberapp.Controller;
+package com.mcsl.hbotchamberapp.model;
 
 public class SensorData {
 

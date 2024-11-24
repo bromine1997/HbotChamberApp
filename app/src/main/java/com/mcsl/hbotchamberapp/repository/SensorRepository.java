@@ -12,7 +12,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.mcsl.hbotchamberapp.Controller.SensorData;
+import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.Service.SensorService;
 
 public class SensorRepository {

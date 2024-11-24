@@ -5,18 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-
 import android.os.Bundle;
 
 import android.widget.TextView;
 
-import com.mcsl.hbotchamberapp.Controller.SensorData;
+import com.mcsl.hbotchamberapp.model.SensorData;
 
 import com.mcsl.hbotchamberapp.ViewModel.IoPortViewModel;
-import com.mcsl.hbotchamberapp.ViewModel.RunViewModel;
 import com.mcsl.hbotchamberapp.databinding.ActivityIoportBinding;
 
 public class IoPortActivity extends AppCompatActivity {

@@ -2,20 +2,16 @@ package com.mcsl.hbotchamberapp.ViewModel;
 
 
 import android.app.Application;
-import android.content.Context;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.mcsl.hbotchamberapp.repository.GpioRepository;
 
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 
-import com.mcsl.hbotchamberapp.Controller.SensorData;
-import com.mcsl.hbotchamberapp.repository.GpioRepository;
+import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.repository.SensorRepository;
 import com.mcsl.hbotchamberapp.repository.ValveRepository;
 

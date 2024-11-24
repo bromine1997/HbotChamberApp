@@ -14,7 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.mcsl.hbotchamberapp.Controller.Co2Sensor;
 import com.mcsl.hbotchamberapp.Controller.Max1032;
-import com.mcsl.hbotchamberapp.Controller.SensorData;
+import com.mcsl.hbotchamberapp.model.SensorData;
 
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;

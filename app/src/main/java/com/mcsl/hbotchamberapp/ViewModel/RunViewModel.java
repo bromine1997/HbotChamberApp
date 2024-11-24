@@ -7,10 +7,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
 import com.mcsl.hbotchamberapp.model.ProfileSection;
-import com.mcsl.hbotchamberapp.Controller.SensorData;
+import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.repository.ProfileRepository;
 import com.mcsl.hbotchamberapp.repository.PIDRepository;
 import com.mcsl.hbotchamberapp.repository.SensorRepository;
@@ -22,6 +21,8 @@ public class RunViewModel extends AndroidViewModel {
     private final MutableLiveData<List<ProfileSection>> profileData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> pidControlRunning = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isWebSocketConnected = new MutableLiveData<>(false);
+
+    private LiveData<Boolean> pidControlRunningServer; // 서버에서 시작한 PID 제어 상태
 
     private PIDRepository pidRepository;
     private SensorRepository sensorRepository;

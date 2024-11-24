@@ -8,6 +8,7 @@ import android.view.View;
 import com.mcsl.hbotchamberapp.Service.GpioService;
 import com.mcsl.hbotchamberapp.Service.SensorService;
 import com.mcsl.hbotchamberapp.Service.ValveService;
+import com.mcsl.hbotchamberapp.Service.WebSocketService;
 import com.mcsl.hbotchamberapp.databinding.ActivityMenuBinding;
 
 public class MenuActivity extends AppCompatActivity {
@@ -34,6 +35,11 @@ public class MenuActivity extends AppCompatActivity {
         // ValveService 시작
         ValveServiceIntent = new Intent(this, ValveService.class);
         startService(ValveServiceIntent);
+
+        // WebSocketService 시작
+        Intent intent = new Intent(this, WebSocketService.class);
+        startService(intent);
+
 
         // 버튼 클릭 리스너 설정
         binding.runButton.setOnClickListener(new View.OnClickListener() {
