@@ -14,6 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.mcsl.hbotchamberapp.BuildConfig;
 import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.model.SensorDataPacket;
 import com.mcsl.hbotchamberapp.model.ServerCommand;
@@ -54,8 +55,13 @@ public class WebSocketService extends Service {
     private String sessionId = null;
     private String userId = null; // userId 필드 추가
 
+    private static final String Websocket_URL = "http://" + BuildConfig.SERVER_ADDRESS;
+
     @Override
     public void onCreate() {
+
+
+
         super.onCreate();
 
         sensorRepository = SensorRepository.getInstance(this);
@@ -78,7 +84,9 @@ public class WebSocketService extends Service {
             options.reconnectionDelay = 1000;
             options.reconnectionDelayMax = 5000;
 
-            mSocket = IO.socket("http://192.168.0.125:8080", options);
+
+
+            mSocket = IO.socket(Websocket_URL, options);
         } catch (Exception e) {
             e.printStackTrace();
         }

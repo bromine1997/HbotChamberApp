@@ -25,7 +25,7 @@ public class ChartManager {
         setupChart();
     }
 
-    private void setupChart() {
+    public void setupChart() {
         profileDataSet = new LineDataSet(null, "Profile Data");
         profileDataSet.setColor(ColorTemplate.getHoloBlue());
         profileDataSet.setLineWidth(3f);

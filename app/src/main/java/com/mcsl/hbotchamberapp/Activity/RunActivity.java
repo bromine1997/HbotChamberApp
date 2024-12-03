@@ -11,6 +11,7 @@ import android.util.Log;
 import com.mcsl.hbotchamberapp.ViewModel.RunViewModel;
 import com.mcsl.hbotchamberapp.databinding.ActivityRunBinding;
 import com.mcsl.hbotchamberapp.model.PIDState;
+import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.util.ChartManager;
 
 public class RunActivity extends AppCompatActivity {
@@ -42,6 +43,8 @@ public class RunActivity extends AppCompatActivity {
 
         // End button click event
         binding.btnEnd.setOnClickListener(v -> viewModel.stopPidControl());
+
+
 
 
         // Pause/Resume button click event
@@ -80,7 +83,7 @@ public class RunActivity extends AppCompatActivity {
                 chartManager.updatePressureChart(sensorData.getPressure(), elapsedTime);
                 Log.d(TAG, "Pressure data updated.");
             }
-            updateChamberPressure(sensorData.getPressure());
+            updateSensorReadings(sensorData);
         });
 
         // Observe formatted elapsed time
@@ -93,6 +96,8 @@ public class RunActivity extends AppCompatActivity {
             String setPointText = String.format("%.2f", setPoint);
             binding.setPointPressure.setText(setPointText);
         });
+
+
 
         // Observe PID 상태
 
@@ -125,6 +130,32 @@ public class RunActivity extends AppCompatActivity {
     private void updateChamberPressure(double pressure) {
         String pressureText = String.format("%.2f ATA", pressure);
         binding.chamberPressure.setText(pressureText);
+    }
+
+    private void updateSensorReadings(SensorData sensorData) {
+        // Update Chamber Pressure
+        String pressureText = String.format("%.2f ATA", sensorData.getPressure());
+        binding.chamberPressure.setText(pressureText);
+
+        // Update Temperature
+        String temperatureText = String.format("%.2f °C", sensorData.getTemperature());
+        binding.temperatureValue.setText(temperatureText);
+
+        // Update Humidity
+        String humidityText = String.format("%.2f %%", sensorData.getHumidity());
+        binding.humidityValue.setText(humidityText);
+
+        // Update Oxygen
+        String oxygenText = String.format("%.2f %%", sensorData.getOxygen());
+        binding.oxygenValue.setText(oxygenText);
+
+        // Update Carbon Dioxide
+        String co2Text = String.format("%.2f %%", sensorData.getCo2());
+        binding.carbonDioxideValue.setText(co2Text);
+
+        // Update Flow Rate
+        String flowRateText = String.format("%.2f L/min", sensorData.getFlowRate());
+        binding.flowRate.setText(flowRateText);
     }
 
 

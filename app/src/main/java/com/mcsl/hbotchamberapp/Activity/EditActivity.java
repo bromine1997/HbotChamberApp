@@ -173,6 +173,12 @@ public class EditActivity extends AppCompatActivity {
         binding.buttonIncreaseEndPressure.setOnClickListener(v -> {
             float currentValue = Float.parseFloat(binding.valueEndPressure.getText().toString());
             currentValue += 0.1;
+
+            // 3기압 초과 시 3으로 설정
+            if (currentValue > 3.0f) {
+                currentValue = 3.0f;
+            }
+
             binding.valueEndPressure.setText(String.format(Locale.US, "%.1f", currentValue));
             updateCurrentSectionData();
         });

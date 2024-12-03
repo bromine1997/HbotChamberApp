@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -49,70 +50,153 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lineChart" />
 
-    <!-- Chamber Status - Chamber Pressure -->
-    <TextView
-        android:id="@+id/chamberPressureLabel"
+    <!-- Sensor Readings -->
+    <TableLayout
+        android:id="@+id/sensorReadings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="Chamber Pressure"
-        android:textColor="#000000"
+        android:stretchColumns="0,1,2"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/elapsedTime"
-        app:layout_constraintWidth_percent="0.33" />
+        app:layout_constraintTop_toBottomOf="@id/elapsedTime">
 
-    <TextView
-        android:id="@+id/chamberPressure"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="test ATA"
-        android:textColor="#000000"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chamberPressureLabel"
-        app:layout_constraintWidth_percent="0.33" />
+        <!-- First Row: Labels -->
+        <TableRow>
+            <TextView
+                android:id="@+id/chamberPressureLabel"
+                android:gravity="center"
+                android:text="Chamber Pressure"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/setPointLabel"
+                android:gravity="center"
+                android:text="Set Point"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/flowRateLabel"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#000000" />
+        </TableRow>
 
-    <!-- Set Point Pressure -->
-    <TextView
-        android:id="@+id/setPointLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="SetPoint"
-        android:textColor="#000000"
-        app:layout_constraintStart_toEndOf="@id/chamberPressureLabel"
-        app:layout_constraintTop_toBottomOf="@id/elapsedTime"
-        app:layout_constraintWidth_percent="0.33" />
+        <!-- First Row: Values -->
+        <TableRow>
+            <TextView
+                android:id="@+id/chamberPressure"
+                android:gravity="center"
+                android:text="test ATA"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/setPointPressure"
+                android:gravity="center"
+                android:text="test ATA"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/flowRate"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#000000"
+                android:textSize="24sp" />
+        </TableRow>
 
-    <TextView
-        android:id="@+id/setPointPressure"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="test ATA"
-        android:textColor="#000000"
-        android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@id/chamberPressure"
-        app:layout_constraintTop_toBottomOf="@id/setPointLabel"
-        app:layout_constraintWidth_percent="0.33" />
+        <!-- Second Row: Labels -->
+        <TableRow>
+            <TextView
+                android:id="@+id/oxygenLabel"
+                android:gravity="center"
+                android:text="Oxygen"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/carbonDioxideLabel"
+                android:gravity="center"
+                android:text="Carbon Dioxide"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/temperatureLabel"
+                android:gravity="center"
+                android:text="Temperature"
+                android:textColor="#000000" />
+        </TableRow>
 
-    <!-- Flow Rate -->
+        <!-- Second Row: Values -->
+        <TableRow>
+            <TextView
+                android:id="@+id/oxygenValue"
+                android:gravity="center"
+                android:text="test %"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/carbonDioxideValue"
+                android:gravity="center"
+                android:text="test %"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/temperatureValue"
+                android:gravity="center"
+                android:text="test °C"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+        </TableRow>
 
-    <!-- Gas Analyzer and Note Buttons -->
+        <!-- Third Row: Labels -->
+        <TableRow>
+            <TextView
+                android:id="@+id/humidityLabel"
+                android:gravity="center"
+                android:text="Humidity"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/placeholderLabel"
+                android:gravity="center"
+                android:text="Flow"
+                android:textColor="#000000" />
+            <TextView
+                android:id="@+id/placeholderLabel2"
+                android:gravity="center"
+                android:text="Extra"
+                android:textColor="#000000" />
+        </TableRow>
 
+        <!-- Third Row: Values -->
+        <TableRow>
+            <TextView
+                android:id="@+id/humidityValue"
+                android:gravity="center"
+                android:text="test %"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/placeholderValue"
+                android:gravity="center"
+                android:text="test%"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/placeholderValue2"
+                android:gravity="center"
+                android:text="test%"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+        </TableRow>
+    </TableLayout>
+
+    <!-- States Section -->
     <LinearLayout
         android:id="@+id/statesBox"
-        android:layout_width="341dp"
-        android:layout_height="203dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="#FFB0E0E6"
         android:orientation="vertical"
         android:padding="8dp"
+        app:layout_constraintEnd_toStartOf="@id/controlButtons"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chamberPressure"
+        app:layout_constraintTop_toBottomOf="@id/sensorReadings"
         app:layout_constraintWidth_percent="0.33">
 
         <TextView
@@ -122,8 +206,9 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <!-- First Row -->
         <LinearLayout
-            android:layout_width="300dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:orientation="horizontal">
@@ -131,13 +216,13 @@
             <View
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/yellow_circle" />
 
             <TextView
-                android:layout_width="130dp"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="DOOR LOCK"
                 android:textColor="#000000"
                 android:textSize="20sp" />
@@ -145,20 +230,21 @@
             <View
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/yellow_circle" />
 
             <TextView
-                android:layout_width="130dp"
-                android:layout_height="37dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="MANUAL"
                 android:textColor="#000000"
                 android:textSize="20sp" />
         </LinearLayout>
 
+        <!-- Second Row -->
         <LinearLayout
-            android:layout_width="300dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:orientation="horizontal">
@@ -167,12 +253,12 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginEnd="8dp"
-                android:layout_gravity="center"
                 android:background="@drawable/yellow_circle" />
 
             <TextView
-                android:layout_width="130dp"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="RUN"
                 android:textColor="#000000"
                 android:textSize="20sp" />
@@ -180,34 +266,35 @@
             <View
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/yellow_circle" />
 
             <TextView
-                android:layout_width="113dp"
-                android:layout_height="31dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="ALARM"
                 android:textColor="#000000"
                 android:textSize="20sp" />
         </LinearLayout>
 
+        <!-- Third Row -->
         <LinearLayout
-            android:layout_width="300dp"
-            android:layout_height="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:orientation="horizontal">
 
             <View
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/yellow_circle" />
 
             <TextView
-                android:layout_width="130dp"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="END"
                 android:textColor="#000000"
                 android:textSize="20sp" />
@@ -216,99 +303,65 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginEnd="8dp"
-                android:layout_gravity="center"
                 android:background="@drawable/yellow_circle" />
 
             <TextView
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="COMPLETE"
                 android:textColor="#000000"
                 android:textSize="20sp" />
         </LinearLayout>
+
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="135dp"
-        android:layout_height="203dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layout_constraintStart_toEndOf="@id/statesBox"
-        app:layout_constraintTop_toBottomOf="@id/chamberPressure"
-        app:layout_constraintWidth_percent="0.33">
-
-        <Button
-            android:id="@+id/btnGasAnalyzer"
-            android:layout_width="121dp"
-            android:layout_height="66dp"
-            android:layout_margin="8dp"
-            android:backgroundTint="#1E90FF"
-            android:text="Gas Analyzer" />
-
-        <Button
-            android:id="@+id/btnNote"
-            android:layout_width="121dp"
-            android:layout_height="66dp"
-            android:layout_margin="8dp"
-            android:backgroundTint="#1E90FF"
-            android:text="Note" />
-    </LinearLayout>
-
-    <!-- Control Buttons - Run, Pause, End, Exit -->
+    <!-- Control Buttons -->
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/controlButtons"
-        android:layout_width="493dp"
-        android:layout_height="198dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="550dp"
+        android:layout_height="92dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.775"
         app:layout_constraintStart_toEndOf="@id/statesBox"
-        app:layout_constraintTop_toBottomOf="@id/chamberPressure"
+        app:layout_constraintTop_toBottomOf="@id/sensorReadings"
         app:layout_constraintWidth_percent="0.34">
 
         <Button
             android:id="@+id/btnRun"
-            android:layout_width="121dp"
-            android:layout_height="66dp"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:backgroundTint="#1E90FF"
             android:text="RUN"
-            android:textSize="20sp"
-            app:layout_column="0"
-            app:layout_row="0" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnPause"
-            android:layout_width="121dp"
-            android:layout_height="66dp"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:backgroundTint="#1E90FF"
             android:text="Pause"
-            android:textSize="20sp"
-            app:layout_column="1"
-            app:layout_row="0" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnEnd"
-            android:layout_width="121dp"
-            android:layout_height="66dp"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:backgroundTint="#1E90FF"
             android:text="END"
-            android:textSize="20sp"
-            app:layout_column="0"
-            app:layout_row="1" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnExit"
-            android:layout_width="121dp"
-            android:layout_height="66dp"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:backgroundTint="#1E90FF"
             android:text="EXIT"
-            android:textSize="20sp"
-            app:layout_column="1"
-            app:layout_row="1" />
+            android:textSize="20sp" />
     </androidx.gridlayout.widget.GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
