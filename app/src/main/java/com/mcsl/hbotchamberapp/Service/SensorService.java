@@ -81,6 +81,8 @@ public class SensorService extends Service {
         handler.post(sensorReadRunnable);
     }
 
+
+
     // 모든 센서 값을 읽고, Intent에 담아 브로드캐스트
     private void readAllSensorValues() {
         try {
@@ -90,6 +92,8 @@ public class SensorService extends Service {
             // UART로 CO2 값을 읽음 (비동기)
             Future<String> futureCo2Data = co2sensor.loopbackCommand("Q\r\n");
             String co2Data = futureCo2Data.get();
+            co2Ppm = parseCo2Value(co2Data);
+
             co2Ppm = parseCo2Value(co2Data);
 
             // Intent에 모든 센서 값을 담음
@@ -187,12 +191,6 @@ public class SensorService extends Service {
         int a1 = 8045;
         double O2Value = ((double) (rawOxygenValue - a0)) * 2090.0 / (double) (a1 - a0);
         return Math.round(O2Value) / 100.0;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Sensor 서비스가 시작되었습니다.");
-        return START_STICKY;
     }
 
     @Override

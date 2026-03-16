@@ -114,7 +114,7 @@ public class PidService extends Service {
         sendPidControlStatusBroadcast(isStart ? "PID_CONTROL_STARTED" : "PID_CONTROL_RESUMED");
 
         final long totalProfileTime = calculateTotalProfileTime(profileData);
-        Log.d(TAG, "총 프로파일 시간: " + totalProfileTime + "ms");
+       // Log.d(TAG, "총 프로파일 시간: " + totalProfileTime + "ms");
 
         // 스케줄러를 초기화
         scheduler = Executors.newScheduledThreadPool(1);
@@ -182,11 +182,11 @@ public class PidService extends Service {
                     if (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD) {
                         output = pressPidController.getOutput(currentPressure, setPoint);
                         controlPressValve(output);
-                        Log.d(TAG, "가압 중");
+                        //Log.d(TAG, "가압 중");
                     } else if (currentPhase == Phase.PRESSURE_DECREASE) {
                         output = ventPidController.getOutput(currentPressure, setPoint);
                         controlVentValve(output);
-                        Log.d(TAG, "감압 중");
+                        //Log.d(TAG, "감압 중");
                     }
                 }
             }

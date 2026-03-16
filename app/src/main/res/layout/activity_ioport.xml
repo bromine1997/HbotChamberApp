@@ -42,7 +42,8 @@
                     android:layout_height="wrap_content"
                     android:text="O2 (%)"
                     android:textColor="#A0A0A0"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/o2_value"
@@ -61,7 +62,8 @@
                     android:layout_height="wrap_content"
                     android:text="CO2 (%)"
                     android:textColor="#A0A0A0"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/co2_value"
@@ -80,7 +82,8 @@
                     android:layout_height="wrap_content"
                     android:text="Humidity (%)"
                     android:textColor="#A0A0A0"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/humidity_value"
@@ -99,7 +102,8 @@
                     android:layout_height="wrap_content"
                     android:text="Temp (°C)"
                     android:textColor="#A0A0A0"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/temp_value"
@@ -118,7 +122,8 @@
                     android:layout_height="wrap_content"
                     android:text="Pressure (ATA)"
                     android:textColor="#A0A0A0"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/pressure_value"
@@ -137,7 +142,8 @@
                     android:layout_height="wrap_content"
                     android:text="Flow (lpm)"
                     android:textColor="#A0A0A0"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/flow_value"
@@ -172,9 +178,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="솔벨브(가압)"
-                    android:textSize="20sp"
-                    android:textColor="#A0A0A0" />
+                    android:text="Solenoid (Press)"
+                    android:textColor="#A0A0A0"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -209,8 +216,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Proportion (Press)"
-                    android:textSize="20sp"
-                    android:textColor="#A0A0A0" />
+                    android:textColor="#A0A0A0"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -260,9 +268,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="솔벨브(감압)"
-                    android:textSize="20sp"
-                    android:textColor="#A0A0A0" />
+                    android:text="Solenoid (Vent)"
+                    android:textColor="#A0A0A0"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -297,8 +306,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Proportion (Vent)"
-                    android:textSize="20sp"
-                    android:textColor="#A0A0A0" />
+                    android:textColor="#A0A0A0"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -369,7 +379,8 @@
                         android:background="@drawable/button_background"
                         android:text="LED 1"
                         android:textColor="#ffffff"
-                        android:textSize="18sp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <android.widget.Button
                         android:id="@+id/controlled2"
@@ -379,7 +390,8 @@
                         android:background="@drawable/button_background"
                         android:text="LED 2"
                         android:textColor="#ffffff"
-                        android:textSize="18sp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <android.widget.Button
                         android:id="@+id/controlled3"
@@ -388,7 +400,8 @@
                         android:background="@drawable/button_background"
                         android:text="LED 3"
                         android:textColor="#ffffff"
-                        android:textSize="18sp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <!-- Switch Status -->

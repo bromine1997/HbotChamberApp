@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Activity.EditActivity">
 
+    <!-- 기존 Guideline 유지 -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontal"
         android:layout_width="wrap_content"
@@ -27,389 +28,434 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toStartOf="@+id/guidelineVertical"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
+            android:layout_height="300dp"
             android:layout_marginTop="20dp"
             android:layout_weight="1"
-            android:layout_height="300dp"
             android:background="@drawable/border"/>
 
-
-
-
-
-        <LinearLayout
-            android:id="@+id/linearLayh"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical">
-        </LinearLayout>
-
-        <LinearLayout
+        <!-- 버튼들을 위한 CardView -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
-            <android.widget.Button
-                android:id="@+id/btnOpen"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/round"
-                android:text="Open"
-                android:textColor="#ffffff"
-                android:textSize="20sp" />
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center"
+                android:background="#E3F2FD">
 
-            <android.widget.Button
-                android:id="@+id/btnNew"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/round"
-                android:text="New"
-                android:textColor="#ffffff"
-                android:textSize="20sp" />
+                <android.widget.Button
+                    android:id="@+id/btnOpen"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round"
+                    android:text="Open"
+                    android:textColor="#ffffff"
+                    android:textSize="24sp" />
 
-            <android.widget.Button
-                android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/round"
-                android:text="Save"
-                android:textColor="#ffffff"
-                android:textSize="20sp" />
+                <android.widget.Button
+                    android:id="@+id/btnNew"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round"
+                    android:text="New"
+                    android:textColor="#ffffff"
+                    android:textSize="24sp" />
 
-            <android.widget.Button
-                android:id="@+id/btnExit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/round"
-                android:text="EXIT"
-                android:textColor="#ffffff"
-                android:textSize="20sp" />
+                <android.widget.Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round"
+                    android:text="Save"
+                    android:textColor="#ffffff"
+                    android:textSize="24sp" />
 
-        </LinearLayout>
+                <android.widget.Button
+                    android:id="@+id/btnExit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round"
+                    android:text="EXIT"
+                    android:textColor="#ffffff"
+                    android:textSize="24sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-        <!-- Number of Sections 조절을 위한 레이아웃 추가 -->
-        <LinearLayout
+        <!-- Number of Sections를 위한 CardView -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
-            <TextView
-                android:id="@+id/numberOfSectionsLabel"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Number of Sections"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center"
+                android:background="#E3F2FD">
 
-            <TextView
-                android:id="@+id/valueNumberOfSections"
-                android:layout_width="89dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/border"
-                android:inputType="number"
-                android:text="0"
-                android:textAlignment="center"
-                android:textSize="24sp" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
 
-            <android.widget.Button
-                android:id="@+id/buttonIncreaseSections"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/round"
-                android:text="+"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
+                    <TextView
+                        android:id="@+id/numberOfSectionsLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Number of Sections"
+                        android:textColor="#1976D2"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
-            <android.widget.Button
-                android:id="@+id/buttonDecreaseSections"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/round"
-                android:text="-"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/valueNumberOfSections"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        android:background="@drawable/border"
+                        android:inputType="number"
+                        android:text="0"
+                        android:textAlignment="center"
+                        android:textSize="20sp" />
 
+
+                    <android.widget.Button
+                        android:id="@+id/buttonDecreaseSections"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="-"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/buttonIncreaseSections"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="+"
+                        android:textColor="#ffffff"
+                        android:textSize="24sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 
+
+
+    <!-- 오른쪽 컨트롤 섹션 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guidelineVertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/controlSectionLabel"
+        <!-- Control Section Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/controlSectionCard"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:layout_marginTop="20dp"
-            android:text="             Control Section"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/valueControlSection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="1.0"
-                android:textAlignment="center"
-                android:background="@drawable/border"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonDecreaseControlSection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="-"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonIncreaseControlSection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="+"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/controlEndPressure"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            android:layout_marginTop="1dp"
-            android:text="          End Pressure(ATA)"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/valueEndPressure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/border"
-                android:text="1.0"
-                android:textAlignment="center"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonDecreaseEndPressure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="-"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonIncreaseEndPressure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="+"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/controlTime"
-            android:background="@drawable/border"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:text="                 TIME(min)"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/valueTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/border"
-                android:text="1.0"
-                android:textAlignment="center"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonDecreaseTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="-"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonIncreaseTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="+"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/controlFLow"
-            android:background="@drawable/border"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:text="                     FLOW"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/valueFlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/border"
-                android:text="1.0"
-                android:textAlignment="center"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonDecreaseFlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="-"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-
-            <android.widget.Button
-                android:id="@+id/buttonIncreaseFlow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:background="@drawable/round"
-                android:text="+"
-                android:textColor="#ffffff"
-                android:textSize="24sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal">
+            android:layout_height="110dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
-                android:background="@drawable/border"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:background="#E3F2FD">
 
                 <TextView
-                    android:id="@+id/controlPressureChange"
+                    android:id="@+id/controlSectionLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Control Section"
                     android:textAlignment="center"
-                    android:layout_marginTop="1dp"
-                    android:text="Control PressureChange"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textColor="#1976D2"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
 
-                <TextView
-                    android:id="@+id/valueControlPressureChange"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1.0"
-                    android:textAlignment="center"
-                    android:textSize="24sp" />
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <android.widget.Button
-                    android:id="@+id/btnCurve"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/round"
-                    android:text="curve"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/valueControlSection"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1.0"
+                        android:textAlignment="center"
+                        android:textSize="24sp"
+                        android:padding="4dp"
+                        android:background="#FFFFFF"
+                        android:layout_marginEnd="8dp"/>
 
+                    <android.widget.Button
+                        android:id="@+id/buttonDecreaseControlSection"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="-"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/buttonIncreaseControlSection"
+                        android:layout_width="55dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="+"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
+        <!-- End Pressure Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:background="#E3F2FD">
+
+                <TextView
+                    android:id="@+id/controlEndPressure"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="End Pressure (ATA)"
+                    android:textAlignment="center"
+                    android:textColor="#1976D2"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/valueEndPressure"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1.0"
+                        android:textAlignment="center"
+                        android:textSize="24sp"
+                        android:padding="4dp"
+                        android:background="#FFFFFF"
+                        android:layout_marginEnd="8dp"/>
+
+                    <android.widget.Button
+                        android:id="@+id/buttonDecreaseEndPressure"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="-"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/buttonIncreaseEndPressure"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="+"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Time Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:background="#E3F2FD">
+
+                <TextView
+                    android:id="@+id/controlTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Time (min)"
+                    android:textAlignment="center"
+                    android:textColor="#1976D2"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/valueTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1.0"
+                        android:textAlignment="center"
+                        android:textSize="24sp"
+                        android:padding="4dp"
+                        android:background="#FFFFFF"
+                        android:layout_marginEnd="8dp"/>
+
+                    <android.widget.Button
+                        android:id="@+id/buttonDecreaseTime"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="-"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/buttonIncreaseTime"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="+"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Flow Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:background="#E3F2FD">
+
+                <TextView
+                    android:id="@+id/controlFlow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Flow"
+                    android:textAlignment="center"
+                    android:textColor="#1976D2"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/valueFlowset"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1.0"
+                        android:textAlignment="center"
+                        android:textSize="24sp"
+                        android:padding="4dp"
+                        android:background="#FFFFFF"
+                        android:layout_marginEnd="8dp"/>
+
+                    <android.widget.Button
+                        android:id="@+id/buttonDecreaseFlow"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="-"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+
+                    <android.widget.Button
+                        android:id="@+id/buttonIncreaseFlow"
+                        android:layout_width="60dp"
+                        android:layout_height="48dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:background="@drawable/round"
+                        android:text="+"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        <!-- 테이블 부분 -->
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="219dp"
-            android:background="@drawable/border">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/border"
+            android:layout_margin="6dp">
 
             <TableLayout
                 android:id="@+id/Table"
@@ -429,7 +475,7 @@
                         android:background="@drawable/border"
                         android:text="#"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/StartPoint"
@@ -439,7 +485,7 @@
                         android:background="@drawable/border"
                         android:text="START P"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/EndPoint"
@@ -449,7 +495,7 @@
                         android:background="@drawable/border"
                         android:text="END P"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/time"
@@ -459,7 +505,7 @@
                         android:background="@drawable/border"
                         android:text="time"
                         android:textAlignment="center"
-                        android:textSize="24sp" />
+                        android:textSize="20sp" />
                 </TableRow>
             </TableLayout>
         </ScrollView>

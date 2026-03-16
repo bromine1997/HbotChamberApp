@@ -198,15 +198,15 @@ public class EditActivity extends AppCompatActivity {
         });
 
         binding.buttonDecreaseFlow.setOnClickListener(v -> {
-            float currentValue = Float.parseFloat(binding.valueFlow.getText().toString());
+            float currentValue = Float.parseFloat(binding.valueFlowset.getText().toString());
             currentValue -= 1;
-            binding.valueFlow.setText(String.format(Locale.US, "%.1f", currentValue));
+            binding.valueFlowset.setText(String.format(Locale.US, "%.1f", currentValue));
         });
 
         binding.buttonIncreaseFlow.setOnClickListener(v -> {
-            float currentValue = Float.parseFloat(binding.valueFlow.getText().toString());
+            float currentValue = Float.parseFloat(binding.valueFlowset.getText().toString());
             currentValue += 1;
-            binding.valueFlow.setText(String.format(Locale.US, "%.1f", currentValue));
+            binding.valueFlowset.setText(String.format(Locale.US, "%.1f", currentValue));
         });
 
         binding.btnNew.setOnClickListener(v -> {
@@ -219,12 +219,6 @@ public class EditActivity extends AppCompatActivity {
             binding.valueNumberOfSections.setText("1");
         });
 
-        binding.btnCurve.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                applyCurve();
-            }
-        });
 
         binding.btnOpen.setOnClickListener(v -> {
             loadProfileDataFromFile();
@@ -311,78 +305,87 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private void updateTable(List<String[]> profileData) {
-        TableLayout tableChart = binding.Table;
+        TableLayout tableLayout = binding.Table;
 
-        if (tableChart.getChildCount() > 1) {
-            tableChart.removeViews(1, tableChart.getChildCount() - 1);
+        // 기존 데이터 행들 제거 (헤더는 유지)
+        if (tableLayout.getChildCount() > 1) {
+            tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
         }
 
         int totalDuration = 0;
 
-        for (int i = 0; i < profileData.size(); i++) {
-            String[] dataRow = profileData.get(i);
+        // 데이터 행 추가
+        for (String[] rowData : profileData) {
             TableRow tableRow = new TableRow(this);
-            tableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            tableRow.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT));
 
-            for (String cellData : dataRow) {
+            for (String cellData : rowData) {
                 TextView textView = new TextView(this);
-                textView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-                textView.setPadding(5, 5, 5, 5);
+                textView.setLayoutParams(new TableRow.LayoutParams(0,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1f));
                 textView.setText(cellData);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                textView.setBackground(ContextCompat.getDrawable(this, R.drawable.border));
+                textView.setPadding(12, 12, 12, 12);
+                textView.setBackgroundColor(Color.WHITE);
                 textView.setTextColor(Color.BLACK);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
-
                 tableRow.addView(textView);
             }
 
-            tableChart.addView(tableRow);
+            tableLayout.addView(tableRow);
 
             try {
-                totalDuration += Integer.parseInt(dataRow[3]);
+                totalDuration += Integer.parseInt(rowData[3]);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         }
 
+        // 합계 행 추가
         TableRow totalRow = new TableRow(this);
-        totalRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        totalRow.setLayoutParams(new TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT));
 
-        TextView totalLabelTextView = new TextView(this);
-        totalLabelTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-        totalLabelTextView.setPadding(5, 5, 5, 5);
-        totalLabelTextView.setText("Total");
-        totalLabelTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        totalLabelTextView.setBackground(ContextCompat.getDrawable(this, R.drawable.border));
-        totalLabelTextView.setTextColor(Color.BLACK);
-        totalLabelTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
-        totalLabelTextView.setTypeface(null, Typeface.BOLD);
-        totalRow.addView(totalLabelTextView);
+        // Total 레이블
+        TextView totalLabel = new TextView(this);
+        totalLabel.setLayoutParams(new TableRow.LayoutParams(0,
+                TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        totalLabel.setText("Total");
+        totalLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        totalLabel.setTypeface(null, Typeface.BOLD);
+        totalLabel.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        totalLabel.setPadding(12, 12, 12, 12);
+        totalLabel.setBackgroundColor(Color.parseColor("#E3F2FD"));
+        totalLabel.setTextColor(Color.parseColor("#1976D2"));
+        totalRow.addView(totalLabel);
 
+        // 빈 셀 2개
         for (int i = 0; i < 2; i++) {
-            TextView emptyTextView = new TextView(this);
-            emptyTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-            emptyTextView.setPadding(5, 5, 5, 5);
-            emptyTextView.setText("");
-            emptyTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            emptyTextView.setBackground(ContextCompat.getDrawable(this, R.drawable.border));
-            emptyTextView.setTextColor(Color.BLACK);
-            emptyTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
-            totalRow.addView(emptyTextView);
+            TextView emptyCell = new TextView(this);
+            emptyCell.setLayoutParams(new TableRow.LayoutParams(0,
+                    TableRow.LayoutParams.WRAP_CONTENT, 1f));
+            emptyCell.setBackgroundColor(Color.WHITE);
+            emptyCell.setPadding(12, 12, 12, 12);
+            totalRow.addView(emptyCell);
         }
 
-        TextView totalValueTextView = new TextView(this);
-        totalValueTextView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-        totalValueTextView.setPadding(5, 5, 5, 5);
-        totalValueTextView.setText(String.valueOf(totalDuration));
-        totalValueTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        totalValueTextView.setBackground(ContextCompat.getDrawable(this, R.drawable.border));
-        totalValueTextView.setTextColor(Color.BLACK);
-        totalValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 21);
-        totalRow.addView(totalValueTextView);
+        // 총 시간
+        TextView totalValue = new TextView(this);
+        totalValue.setLayoutParams(new TableRow.LayoutParams(0,
+                TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        totalValue.setText(String.valueOf(totalDuration));
+        totalValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        totalValue.setTypeface(null, Typeface.BOLD);
+        totalValue.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        totalValue.setPadding(12, 12, 12, 12);
+        totalValue.setBackgroundColor(Color.WHITE);
+        totalValue.setTextColor(Color.BLACK);
+        totalRow.addView(totalValue);
 
-        tableChart.addView(totalRow);
+        tableLayout.addView(totalRow);
     }
 
     private void addSection() {
@@ -420,7 +423,7 @@ public class EditActivity extends AppCompatActivity {
 
             binding.valueEndPressure.setText(currentSection[2]);
             binding.valueTime.setText(currentSection[3]);
-            binding.valueFlow.setText("Flow value here");
+          //  binding.valueFlowset.setText("Flow value here");
             binding.valueControlSection.setText(String.valueOf(currentSectionIndex + 1));
         }
     }
@@ -450,6 +453,8 @@ public class EditActivity extends AppCompatActivity {
         List<Entry> entries = new ArrayList<>();
         PressureTimeChart pressureTimeChart = new PressureTimeChart(chart, currentProfile);
         pressureTimeChart.drawChart();
+
+
     }
 
     private void updateChart() {
@@ -517,10 +522,16 @@ public class EditActivity extends AppCompatActivity {
     private void configureChartAppearance() {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        xAxis.setTextSize(20f);  // X축 텍스트 크기 증가
+
         YAxis leftAxis = chart.getAxisLeft();
         YAxis rightAxis = chart.getAxisRight();
+
+        leftAxis.setTextSize(20f);  // Y축 텍스트 크기 증가
+        leftAxis.setGranularity(0.5f);  // Y축 간격을 0.5로 설정
         leftAxis.setSpaceTop(100f);
-        leftAxis.setGranularity(0.25f);
+
         xAxis.setSpaceMin(2f);
         xAxis.setSpaceMax(10f);
 
@@ -563,6 +574,7 @@ public class EditActivity extends AppCompatActivity {
             binding.valueNumberOfSections.setText(String.valueOf(numSections));
         }
     }
+
 
     @Override
     protected void onStart() {

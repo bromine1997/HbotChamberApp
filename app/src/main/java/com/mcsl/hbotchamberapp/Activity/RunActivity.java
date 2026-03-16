@@ -81,7 +81,7 @@ public class RunActivity extends AppCompatActivity {
                         ? viewModel.getElapsedTime().getValue()
                         : 0;
                 chartManager.updatePressureChart(sensorData.getPressure(), elapsedTime);
-                Log.d(TAG, "Pressure data updated.");
+                //Log.d(TAG, "Pressure data updated.");
             }
             updateSensorReadings(sensorData);
         });
@@ -93,7 +93,7 @@ public class RunActivity extends AppCompatActivity {
 
         // Observe setPoint
         viewModel.getSetPoint().observe(this, setPoint -> {
-            String setPointText = String.format("%.2f", setPoint);
+            String setPointText = String.format("%.2f ATA", setPoint);
             binding.setPointPressure.setText(setPointText);
         });
 
@@ -150,12 +150,10 @@ public class RunActivity extends AppCompatActivity {
         binding.oxygenValue.setText(oxygenText);
 
         // Update Carbon Dioxide
-        String co2Text = String.format("%.2f %%", sensorData.getCo2());
+        String co2Text = String.format("%.2f PPM", sensorData.getCo2());
         binding.carbonDioxideValue.setText(co2Text);
 
-        // Update Flow Rate
-        String flowRateText = String.format("%.2f L/min", sensorData.getFlowRate());
-        binding.flowRate.setText(flowRateText);
+
     }
 
 

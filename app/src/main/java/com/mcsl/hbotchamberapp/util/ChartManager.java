@@ -27,12 +27,19 @@ public class ChartManager {
 
     public void setupChart() {
         profileDataSet = new LineDataSet(null, "Profile Data");
-        profileDataSet.setColor(ColorTemplate.getHoloBlue());
+        // 선 색상을 검정색으로 변경
+        profileDataSet.setColor(Color.BLACK);
         profileDataSet.setLineWidth(3f);
         profileDataSet.setDrawCircles(true);
         profileDataSet.setDrawValues(false);
-        profileDataSet.setDrawFilled(true);
-        profileDataSet.setFillColor(Color.BLUE);
+        // 배경색 채우기 비활성화
+        profileDataSet.setDrawFilled(false);
+        // setFillColor는 더 이상 필요하지 않으므로 제거
+
+        // 점 그리기 비활성화
+        profileDataSet.setDrawCircles(false);
+        profileDataSet.setDrawValues(false);
+        profileDataSet.setDrawFilled(false);
 
         pressureDataSet = new LineDataSet(null, "Pressure Data");
         pressureDataSet.setColor(Color.RED);
@@ -49,9 +56,12 @@ public class ChartManager {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextSize(20f);  // X축 텍스트 크기 설정
 
         YAxis yAxis = chart.getAxisLeft();
-        yAxis.setAxisMaximum(4f);
+        yAxis.setGranularity(0.5f);
+        yAxis.setAxisMaximum(3.5f);
+        yAxis.setTextSize(20f);  // Y축 텍스트 크기 설정
         chart.getAxisRight().setEnabled(false);  // Disable right Y-axis
     }
 

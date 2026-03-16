@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +12,9 @@
         android:id="@+id/runButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="100dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/button_background"
         android:elevation="6dp"
         android:text="RUN"
@@ -22,15 +25,15 @@
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.32" />
+        app:layout_constraintWidth_percent="0.30" />
 
     <android.widget.Button
         android:id="@+id/editButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="100dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/button_background"
         android:text="EDIT"
         android:textColor="#FFFFFF"
@@ -40,15 +43,15 @@
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintStart_toEndOf="@id/runButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.32" />
+        app:layout_constraintWidth_percent="0.30" />
 
     <android.widget.Button
         android:id="@+id/ioportButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="100dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/button_background"
         android:text="IOPORT"
         android:textColor="#FFFFFF"
@@ -58,23 +61,23 @@
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintStart_toEndOf="@id/editButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.32" />
+        app:layout_constraintWidth_percent="0.30" />
 
     <android.widget.Button
         android:id="@+id/exitButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="208dp"
-        android:layout_marginEnd="264dp"
         android:background="@drawable/button_background"
         android:text="EXIT"
         android:textColor="#FFFFFF"
         android:textSize="50sp"
         android:fontFamily="sans-serif-medium"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.20"
         app:layout_constraintTop_toBottomOf="@id/runButton"
-        app:layout_constraintWidth_percent="0.48" />
+        app:layout_constraintWidth_percent="0.48"
+        android:layout_marginHorizontal="16dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+</androidx.constraintlayout.widget.ConstraintLayout>

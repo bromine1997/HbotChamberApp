@@ -115,7 +115,7 @@ public class Max1032 {
         for (int channel = 0; channel < 6; channel++) {
             values[channel] = Read(channel);
         }
-        Log.d(TAG, "values: " + Arrays.toString(values));
+        //Log.d(TAG, "values: " + Arrays.toString(values));
         return values;
     }
 

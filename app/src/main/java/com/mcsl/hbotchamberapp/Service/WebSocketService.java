@@ -30,6 +30,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -38,6 +40,12 @@ import io.socket.emitter.Emitter;
 public class WebSocketService extends Service {
     private static final String TAG = "WebSocketService";
 
+    private ScheduledExecutorService scheduler;
+
+    private static final long TRANSMISSION_INTERVAL = 1000; // 1초
+
+    private int sendCounter = 0; // 전송 횟수 추적용 변수
+    private int testcounter = 0;
     private ExecutorService executorService;
 
     private Socket mSocket;
@@ -110,6 +118,9 @@ public class WebSocketService extends Service {
         LocalBroadcastManager.getInstance(this).registerReceiver(pidControlReceiver, filter);
 
         executorService = Executors.newSingleThreadExecutor();
+
+        // ScheduledExecutorService 초기화
+        scheduler = Executors.newScheduledThreadPool(1);
     }
 
     private Emitter.Listener onConnect = new Emitter.Listener() {
@@ -185,15 +196,85 @@ public class WebSocketService extends Service {
             sensorRepository.getSensorData().observeForever(sensorDataObserver);
             pidRepository.getElapsedTime().observeForever(elapsedTimeObserver);
             pidRepository.getSetPoint().observeForever(setPointObserver);
+
+            // 스케줄된 전송 시작
+            startScheduledTransmission();
         }
     }
+
+    private void startScheduledTransmission() {
+        scheduler.scheduleAtFixedRate(
+                this::sendCurrentSensorData,
+                0, // 초기 지연 없음
+                TRANSMISSION_INTERVAL, // 1초 간격
+                TimeUnit.MILLISECONDS
+        );
+    }
+
+    private void sendCurrentSensorData() {
+        if (!isObservingSensorData ||
+                (pidRepository.getPidState().getValue() != PIDState.STARTED &&
+                        pidRepository.getPidState().getValue() != PIDState.RUNNING)) {
+            return;
+        }
+
+        try {
+            SensorData currentSensorData = sensorRepository.getSensorData().getValue();
+            if (currentSensorData == null) {
+                Log.w(TAG, "No sensor data available");
+                return;
+            }
+
+            long currentElapsedTime = pidRepository.getElapsedTime().getValue() != null ?
+                    pidRepository.getElapsedTime().getValue() : 0L;
+
+            double currentSetPoint = pidRepository.getSetPoint().getValue() != null ?
+                    pidRepository.getSetPoint().getValue() : 0.0;
+
+            String deviceId = "chamber 1";
+            SensorDataPacket packet = new SensorDataPacket(
+                    deviceId,
+                    sessionId,
+                    userId,
+                    currentSensorData,
+                    currentElapsedTime,
+                    currentSetPoint
+            );
+
+            if (isConnected) {
+                JSONObject jsonData = new JSONObject(gson.toJson(packet));
+                mSocket.emit("sensor_data", jsonData);
+                sendCounter++;
+                Log.d(TAG, "Data sent. Count: " + sendCounter + ", ElapsedTime: " + currentElapsedTime);
+            } else {
+                Log.w(TAG, "Socket not connected. Saving data locally");
+                saveSensorDataLocally(packet);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error sending sensor data", e);
+        }
+    }
+
 
     private void stopSendingSensorData() {
         if (isObservingSensorData) {
             isObservingSensorData = false;
+            // LiveData 옵저버 제거
             sensorRepository.getSensorData().removeObserver(sensorDataObserver);
             pidRepository.getElapsedTime().removeObserver(elapsedTimeObserver);
             pidRepository.getSetPoint().removeObserver(setPointObserver);
+
+            // 스케줄된 작업 중단
+            if (scheduler != null && !scheduler.isShutdown()) {
+                scheduler.shutdown();
+                try {
+                    if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                        scheduler.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    scheduler.shutdownNow();
+                }
+            }
         }
     }
 
@@ -201,22 +282,9 @@ public class WebSocketService extends Service {
     private final Observer<SensorData> sensorDataObserver = new Observer<SensorData>() {
         @Override
         public void onChanged(SensorData data) {
-            if (data != null && sessionId != null && (pidRepository.getPidState().getValue() == PIDState.STARTED || pidRepository.getPidState().getValue() == PIDState.RUNNING)) { // STARTED 또는 RUNNING 상태일 때만 전송
-                executorService.execute(() -> {
-                    String deviceId = "chamber 1"; // deviceId는 하드코딩 또는 설정값 사용
-                    SensorDataPacket packet = new SensorDataPacket(deviceId, sessionId, userId, data, elapsedTimeValue, setPointValue);
-                    if (isConnected) {
-                        try {
-                            JSONObject jsonData = new JSONObject(gson.toJson(packet));
-                            mSocket.emit("sensor_data", jsonData);
-                            Log.d(TAG, "onChanged: 데이터 전송");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        saveSensorDataLocally(packet);
-                    }
-                });
+            // 데이터 변경 감지만 하고 전송은 하지 않음
+            if (data != null) {
+                Log.d(TAG, "Sensor data updated");
             }
         }
     };
@@ -296,12 +364,17 @@ public class WebSocketService extends Service {
 
     @Override
     public void onDestroy() {
+        stopSendingSensorData();
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
         super.onDestroy();
+
         if (mSocket != null) {
             mSocket.disconnect();
             mSocket.off();
         }
-        stopSendingSensorData();
+       // stopSendingSensorData();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(pidControlReceiver);
     }
 
