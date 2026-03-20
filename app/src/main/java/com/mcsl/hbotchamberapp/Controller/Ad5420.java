@@ -55,7 +55,7 @@ public class Ad5420 {
         clear = new Gpio(28);                   //CLEAR PIN 공통으로 사용
 
 
-
+        latch1.write(Dir.DIR_OUT);              // latch pin 방향 추가 
         clear.dir(Dir.DIR_OUT);
 
         // Initialize pins to default state
