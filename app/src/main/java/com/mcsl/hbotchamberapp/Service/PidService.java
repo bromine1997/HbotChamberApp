@@ -53,6 +53,18 @@ public class PidService extends Service {
     private long pauseStartTime = 0;
     private long totalPausedDuration = 0;
 
+    // [수정] currentSection, sectionStartElapsed를 인스턴스 변수로 선언.
+    // 기존에는 Runnable 내부 지역변수(currentSection, sectionStartTime)였기 때문에
+    // RESUME 시 isPaused=false만 설정해도 sectionStartTime이 절대 시각 기준이라
+    // 일시정지 동안 흐른 시간이 구간 경과 시간에 그대로 포함되는 버그가 있었음.
+
+    // 2026 - 03 - 20 수정
+    // → sectionStartElapsed: 절대 시각(ms) 대신 elapsedTime(ms) 기준으로 저장.
+    //   elapsedTime은 이미 totalPausedDuration을 뺀 값이므로,
+    //   구간 경과 시간도 자동으로 일시정지 구간이 제외됨.
+    private int currentSection = 0;
+    private long sectionStartElapsed = 0;
+
     private enum Phase {
         PRESSURE_INCREASE,
         PRESSURE_HOLD,
@@ -105,6 +117,10 @@ public class PidService extends Service {
             startTime = System.currentTimeMillis();
             totalPausedDuration = 0;
             isPaused = false;
+            //2026 - 03 - 20 수정
+            // [수정] 새로 시작할 때 구간 상태도 초기화
+            currentSection = 0;
+            sectionStartElapsed = 0;
         } else {
             // RESUME의 경우 startTime과 totalPausedDuration을 유지
             startTime = System.currentTimeMillis() - elapsedTime;
@@ -120,8 +136,9 @@ public class PidService extends Service {
         scheduler = Executors.newScheduledThreadPool(1);
 
         scheduler.scheduleAtFixedRate(new Runnable() {
-            private int currentSection = 0;
-            private long sectionStartTime = System.currentTimeMillis();
+            // 2026 - 03 - 20 수정
+            // [수정] currentSection, sectionStartTime 지역변수 제거.
+            // 인스턴스 변수(currentSection, sectionStartElapsed)를 직접 사용함.
 
             @Override
             public void run() {
@@ -149,14 +166,23 @@ public class PidService extends Service {
 
                     long duration = (long) (Double.parseDouble(section[3]) * 60 * 1000);
 
-                    long sectionElapsedTime = System.currentTimeMillis() - sectionStartTime;
+                    // [수정] 구간 경과 시간을 elapsedTime 기준으로 계산.
+                    // 기존: System.currentTimeMillis() - sectionStartTime
+                    //   → 일시정지 중에도 시간이 흘러 구간이 앞당겨지는 버그 존재.
+                    //2026 - 03 - 20 수정
+                    // 변경: elapsedTime - sectionStartElapsed
+                    //   → elapsedTime은 totalPausedDuration을 이미 뺀 값이므로
+                    //      일시정지 시간이 구간 경과에 포함되지 않음.
+                    long sectionElapsedTime = elapsedTime - sectionStartElapsed;
 
                     if (sectionElapsedTime < duration) {
                         setPoint = startPressure + ((endPressure - startPressure) * (sectionElapsedTime / (double) duration));
                     } else {
                         setPoint = endPressure;
                         currentSection++;
-                        sectionStartTime = System.currentTimeMillis();
+                        // [수정] sectionStartTime = System.currentTimeMillis() 대신
+                        // elapsedTime 기준으로 구간 시작점 갱신
+                        sectionStartElapsed = elapsedTime;
                     }
 
                     pidRepository.setSetPoint(setPoint);
@@ -208,7 +234,7 @@ public class PidService extends Service {
     private void stopPIDControl() {
         if (scheduler != null) {
             scheduler.shutdown();
-            scheduler = null; // 스케줄러를 null로 설정합니다.
+            scheduler = null; // 스케줄러를 null로 설정
         }
 
         pidRepository.setPidState(PIDState.STOPPED); // 상태 업데이트
@@ -217,6 +243,9 @@ public class PidService extends Service {
         startTime = 0;
         totalPausedDuration = 0;
         isPaused = false;
+        // [수정] STOP 시 구간 상태도 초기화
+        currentSection = 0;
+        sectionStartElapsed = 0;
 
         sendPidControlStatusBroadcast("PID_CONTROL_STOPPED");
 

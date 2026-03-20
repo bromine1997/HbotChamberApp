@@ -54,6 +54,9 @@ public class Co2Sensor {
         }
     }
 
+    // CO2 센서 응답 대기 타임아웃 (ms)
+    private static final long CO2_RESPONSE_TIMEOUT_MS = 2000;
+
     public Future<String> loopbackCommand(String message) {
         return dataReadingExecutor.submit(new Callable<String>() {
             @Override
@@ -62,7 +65,23 @@ public class Co2Sensor {
                     flush();
                     UART0.writeStr(message);
                     Thread.sleep(10); // 데이터 도착 시간 대기
-                    while (!UART0.dataAvailable());
+
+                    // [수정] 기존: while (!UART0.dataAvailable());
+                    //   → 센서가 응답하지 않으면 스레드가 영원히 블록되는 무한 루프.
+                    //     CO2 센서 연결 끊김 등 이상 상황 시 전체 센서 읽기가 중단됨.
+                    //2026 - 03 - 20 수정 
+                    // 변경: 타임아웃(2초)을 설정하고, 10ms 간격으로 확인.
+                    //   → 타임아웃 초과 시 예외를 던져 호출 측에서 처리할 수 있도록 함.
+                    //   → Thread.sleep(10)으로 busy-wait CPU 점유도 방지.
+                    
+                    long deadline = System.currentTimeMillis() + CO2_RESPONSE_TIMEOUT_MS;
+                    while (!UART0.dataAvailable()) {
+                        if (System.currentTimeMillis() > deadline) {
+                            Log.e(TAG, "CO2 sensor response timeout: " + message.trim());
+                            throw new Exception("CO2 sensor timeout");
+                        }
+                        Thread.sleep(10);
+                    }
 
                     String recieveStr = UART0.readStr(50); // 수신 데이터 읽기
 
