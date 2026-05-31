@@ -15,6 +15,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.mcsl.hbotchamberapp.Controller.Co2Sensor;
 import com.mcsl.hbotchamberapp.Controller.Max1032;
 import com.mcsl.hbotchamberapp.model.SensorData;
+import com.mcsl.hbotchamberapp.repository.SensorRepository;
 
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -35,6 +36,7 @@ public class SensorService extends Service {
 
     private final IBinder binder = new LocalBinder();
     private final MutableLiveData<SensorData> sensorDataLiveData = new MutableLiveData<>();
+    private SensorRepository sensorRepository;
 
     public class LocalBinder extends Binder {
         public SensorService getService() {
@@ -45,6 +47,10 @@ public class SensorService extends Service {
 
     public LiveData<SensorData> getSensorData() {
         return sensorDataLiveData;
+    }
+
+    public void setRepository(SensorRepository repository) {
+        this.sensorRepository = repository;
     }
 
 
@@ -105,7 +111,11 @@ public class SensorService extends Service {
             sensorDataIntent.putExtra("co2Ppm", co2Ppm);
 
             SensorData data = new SensorData(pressure, temperature, humidity, oxygen, co2Ppm, flowRate);
-            sensorDataLiveData.postValue(data);
+            if (sensorRepository != null) {
+                sensorRepository.setSensorData(data);
+            } else {
+                sensorDataLiveData.postValue(data);
+            }
 
             // 한 번에 브로드캐스트 전송
             LocalBroadcastManager.getInstance(this).sendBroadcast(sensorDataIntent);
@@ -120,8 +130,12 @@ public class SensorService extends Service {
             sensorDataIntent.putExtra("pressure", -999);
             sensorDataIntent.putExtra("oxygen", -999);
 
-            SensorData data = new SensorData(-999, -999, -999, -999, -999, -999);
-            sensorDataLiveData.postValue(data);
+            SensorData errorData = new SensorData(-999, -999, -999, -999, -999, -999);
+            if (sensorRepository != null) {
+                sensorRepository.setSensorData(errorData);
+            } else {
+                sensorDataLiveData.postValue(errorData);
+            }
 
 
             LocalBroadcastManager.getInstance(this).sendBroadcast(sensorDataIntent);

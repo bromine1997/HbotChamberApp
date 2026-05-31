@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.mcsl.hbotchamberapp.Controller.PinController;
+import com.mcsl.hbotchamberapp.repository.GpioRepository;
 
 
 public class GpioService extends Service {
@@ -31,9 +32,14 @@ public class GpioService extends Service {
     }
 
     private final MutableLiveData<Byte> inputStatusLiveData = new MutableLiveData<>();
+    private GpioRepository gpioRepository;
 
     public LiveData<Byte> getInputStatus() {
         return inputStatusLiveData;
+    }
+
+    public void setRepository(GpioRepository repository) {
+        this.gpioRepository = repository;
     }
 
     @Override
@@ -58,8 +64,12 @@ public class GpioService extends Service {
     }
 
     private void readAndUpdateInputStatus() {
-        byte inputStatus = pinController.readInputs(); // 외부 입력 스위치 주기적으로 확인
-        inputStatusLiveData.postValue(inputStatus);
+        byte inputStatus = pinController.readInputs();
+        if (gpioRepository != null) {
+            gpioRepository.setInputStatus(inputStatus);
+        } else {
+            inputStatusLiveData.postValue(inputStatus);
+        }
     }
 
     public void toggleLed(int ledNumber) {

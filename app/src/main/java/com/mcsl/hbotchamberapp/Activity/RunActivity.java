@@ -2,9 +2,15 @@ package com.mcsl.hbotchamberapp.Activity;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -22,6 +28,14 @@ public class RunActivity extends AppCompatActivity {
     private boolean isPaused = false;
     private boolean isRunning = false;
 
+    private final BroadcastReceiver safetyErrorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("message");
+            showSafetyAlert(message != null ? message : "알 수 없는 오류가 발생했습니다");
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +45,9 @@ public class RunActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(RunViewModel.class);
         chartManager = new ChartManager(binding.lineChart);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                safetyErrorReceiver, new IntentFilter("PID_SAFETY_ERROR"));
 
         // Observe LiveData from ViewModel
         setupObservers();
@@ -157,10 +174,20 @@ public class RunActivity extends AppCompatActivity {
     }
 
 
+    private void showSafetyAlert(String message) {
+        if (isFinishing()) return;
+        new AlertDialog.Builder(this)
+                .setTitle("안전 경고")
+                .setMessage(message)
+                .setPositiveButton("확인", null)
+                .setCancelable(false)
+                .show();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(safetyErrorReceiver);
         binding = null;
-
     }
 }

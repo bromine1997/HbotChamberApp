@@ -166,7 +166,7 @@ public class PidService extends Service {
 
                     long duration = (long) (Double.parseDouble(section[3]) * 60 * 1000);
 
-                    // [수정] 구간 경과 시간을 elapsedTime 기준으로 계산.
+                    // [수정] 구간 경과 시간을 elapsedTime 기준으로 계산.b
                     // 기존: System.currentTimeMillis() - sectionStartTime
                     //   → 일시정지 중에도 시간이 흘러 구간이 앞당겨지는 버그 존재.
                     //2026 - 03 - 20 수정

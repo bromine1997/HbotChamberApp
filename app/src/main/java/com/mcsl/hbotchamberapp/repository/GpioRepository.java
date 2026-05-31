@@ -8,7 +8,6 @@ import android.os.IBinder;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.mcsl.hbotchamberapp.Service.GpioService;
 
@@ -43,9 +42,7 @@ public class GpioRepository {
             GpioService.LocalBinder binder = (GpioService.LocalBinder) service;
             gpioService = binder.getService();
             isServiceBound = true;
-
-            // 입력 상태 관찰
-            gpioService.getInputStatus().observeForever(inputStatusObserver);
+            gpioService.setRepository(GpioRepository.this);
         }
 
         @Override
@@ -54,12 +51,9 @@ public class GpioRepository {
         }
     };
 
-    private Observer<Byte> inputStatusObserver = new Observer<Byte>() {
-        @Override
-        public void onChanged(Byte status) {
-            inputStatusLiveData.postValue(status);
-        }
-    };
+    public void setInputStatus(byte status) {
+        inputStatusLiveData.postValue(status);
+    }
 
     public LiveData<Byte> getInputStatus() {
         return inputStatusLiveData;
@@ -73,7 +67,6 @@ public class GpioRepository {
 
     public void unbindService() {
         if (isServiceBound) {
-            gpioService.getInputStatus().removeObserver(inputStatusObserver);
             context.unbindService(serviceConnection);
             isServiceBound = false;
         }

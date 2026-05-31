@@ -2,6 +2,12 @@ plugins {
     id("com.android.application")
 }
 
+val localProperties = java.util.Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
 android {
     namespace = "com.mcsl.hbotchamberapp"
     compileSdk = 34
@@ -14,6 +20,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "ADMIN_USERNAME", "\"${localProperties.getProperty("ADMIN_USERNAME") ?: "admin"}\"")
+        buildConfigField("String", "ADMIN_PASSWORD", "\"${localProperties.getProperty("ADMIN_PASSWORD") ?: "1234"}\"")
     }
 
     buildFeatures {

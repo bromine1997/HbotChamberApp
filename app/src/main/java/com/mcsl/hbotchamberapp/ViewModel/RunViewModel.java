@@ -131,19 +131,18 @@ public class RunViewModel extends AndroidViewModel {
     }
 
     public void addProfileSection(ProfileSection section) {
-        List<ProfileSection> currentData = profileData.getValue();
-        if (currentData == null) {
-            currentData = new ArrayList<>();
-        }
-        currentData.add(section);
-        profileData.setValue(currentData);
+        List<ProfileSection> current = profileData.getValue();
+        List<ProfileSection> newList = (current == null) ? new ArrayList<>() : new ArrayList<>(current);
+        newList.add(section);
+        profileData.setValue(newList);
     }
 
     public void updateProfileSection(int index, ProfileSection updatedSection) {
-        List<ProfileSection> currentData = profileData.getValue();
-        if (currentData != null && index >= 0 && index < currentData.size()) {
-            currentData.set(index, updatedSection);
-            profileData.setValue(currentData);
+        List<ProfileSection> current = profileData.getValue();
+        if (current != null && index >= 0 && index < current.size()) {
+            List<ProfileSection> newList = new ArrayList<>(current);
+            newList.set(index, updatedSection);
+            profileData.setValue(newList);
         }
     }
 }

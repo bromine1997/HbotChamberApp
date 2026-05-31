@@ -160,26 +160,27 @@ public class EditActivity extends AppCompatActivity {
 
         binding.buttonDecreaseEndPressure.setOnClickListener(v -> {
             float currentValue = Float.parseFloat(binding.valueEndPressure.getText().toString());
-            if (currentValue > 1) {
-                currentValue -= 0.1;
-                binding.valueEndPressure.setText(String.format(Locale.US, "%.1f", currentValue));
+            if (currentValue > 1.00f) {
+                currentValue -= 0.05f;
+                currentValue = Math.max(1.00f, currentValue);
+                binding.valueEndPressure.setText(String.format(Locale.US, "%.2f", currentValue));
                 updateCurrentSectionData();
             } else {
-                currentValue = 1;
-                binding.valueEndPressure.setText(String.format(Locale.US, "%.1f", currentValue));
+                currentValue = 1.00f;
+                binding.valueEndPressure.setText(String.format(Locale.US, "%.2f", currentValue));
             }
         });
 
         binding.buttonIncreaseEndPressure.setOnClickListener(v -> {
             float currentValue = Float.parseFloat(binding.valueEndPressure.getText().toString());
-            currentValue += 0.1;
+            currentValue += 0.05f;
 
             // 3기압 초과 시 3으로 설정
-            if (currentValue > 3.0f) {
-                currentValue = 3.0f;
+            if (currentValue > 3.00f) {
+                currentValue = 3.00f;
             }
 
-            binding.valueEndPressure.setText(String.format(Locale.US, "%.1f", currentValue));
+            binding.valueEndPressure.setText(String.format(Locale.US, "%.2f", currentValue));
             updateCurrentSectionData();
         });
 
@@ -211,7 +212,7 @@ public class EditActivity extends AppCompatActivity {
 
         binding.btnNew.setOnClickListener(v -> {
             List<String[]> newProfile = new ArrayList<>();
-            newProfile.add(new String[]{"1", "1.0", "1.0", "5"});
+            newProfile.add(new String[]{"1", "1.00", "1.00", "5"});
             updateTable(newProfile);
             currentProfile = newProfile;
             currentSectionIndex = 0;
@@ -389,7 +390,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private void addSection() {
-        currentProfile.add(new String[]{String.valueOf(currentProfile.size() + 1), "1.0", "1.0", "5"});
+        currentProfile.add(new String[]{String.valueOf(currentProfile.size() + 1), "1.00", "1.00", "5"});
         updateTable(currentProfile);
     }
 

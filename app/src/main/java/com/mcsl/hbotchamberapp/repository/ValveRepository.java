@@ -10,7 +10,6 @@ import android.os.IBinder;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.mcsl.hbotchamberapp.Service.ValveService;
 
@@ -46,32 +45,22 @@ public class ValveRepository {
             ValveService.LocalBinder binder = (ValveService.LocalBinder) service;
             valveService = binder.getService();
             isServiceBound = true;
-
-            valveService.getPressValveCurrentLiveData().observeForever(pressValveCurrentObserver);
-            valveService.getVentValveCurrentLiveData().observeForever(ventValveCurrentObserver);
+            valveService.setRepository(ValveRepository.this);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             isServiceBound = false;
-            valveService.getPressValveCurrentLiveData().removeObserver(pressValveCurrentObserver);
-            valveService.getVentValveCurrentLiveData().removeObserver(ventValveCurrentObserver);
         }
     };
 
-    private Observer<Double> pressValveCurrentObserver = new Observer<Double>() {
-        @Override
-        public void onChanged(Double value) {
-            pressValveCurrentLiveData.postValue(value);
-        }
-    };
+    public void setPressValveCurrent(double value) {
+        pressValveCurrentLiveData.postValue(value);
+    }
 
-    private Observer<Double> ventValveCurrentObserver = new Observer<Double>() {
-        @Override
-        public void onChanged(Double value) {
-            ventValveCurrentLiveData.postValue(value);
-        }
-    };
+    public void setVentValveCurrent(double value) {
+        ventValveCurrentLiveData.postValue(value);
+    }
 
     // 밸브 제어 메소드들
 

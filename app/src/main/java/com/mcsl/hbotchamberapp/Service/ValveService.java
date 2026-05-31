@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.mcsl.hbotchamberapp.Controller.Ad5420;
 import com.mcsl.hbotchamberapp.Controller.PinController;
+import com.mcsl.hbotchamberapp.repository.ValveRepository;
 
 public class ValveService extends Service {
     private static final String TAG = "ValveService";
@@ -20,7 +21,7 @@ public class ValveService extends Service {
 
     private MutableLiveData<Double> pressValveCurrentLiveData = new MutableLiveData<>();
     private MutableLiveData<Double> ventValveCurrentLiveData = new MutableLiveData<>();
-
+    private ValveRepository valveRepository;
 
     private PinController pinController;
     private Ad5420 ad5420;
@@ -39,6 +40,10 @@ public class ValveService extends Service {
 
     public LiveData<Double> getVentValveCurrentLiveData() {
         return ventValveCurrentLiveData;
+    }
+
+    public void setRepository(ValveRepository repository) {
+        this.valveRepository = repository;
     }
 
 
@@ -70,13 +75,15 @@ public class ValveService extends Service {
     public void pressValveUp() {
         ad5420.PressValveCurrentUp();
         double currentInMA = ad5420.getPressCurrentInMA();
-        pressValveCurrentLiveData.postValue(currentInMA);
+        if (valveRepository != null) valveRepository.setPressValveCurrent(currentInMA);
+        else pressValveCurrentLiveData.postValue(currentInMA);
     }
 
     public void pressValveDown() {
         ad5420.PressValveCurrentDown();
         double currentInMA = ad5420.getPressCurrentInMA();
-        pressValveCurrentLiveData.postValue(currentInMA);
+        if (valveRepository != null) valveRepository.setPressValveCurrent(currentInMA);
+        else pressValveCurrentLiveData.postValue(currentInMA);
     }
 
 
@@ -91,15 +98,15 @@ public class ValveService extends Service {
     public void ventValveUp() {
         ad5420.VentValveCurrentUp();
         double currentInMA = ad5420.getVentCurrentInMA();
-        ventValveCurrentLiveData.postValue(currentInMA);
-
+        if (valveRepository != null) valveRepository.setVentValveCurrent(currentInMA);
+        else ventValveCurrentLiveData.postValue(currentInMA);
     }
 
     public void ventValveDown() {
         ad5420.VentValveCurrentDown();
         double currentInMA = ad5420.getVentCurrentInMA();
-        ventValveCurrentLiveData.postValue(currentInMA);
-
+        if (valveRepository != null) valveRepository.setVentValveCurrent(currentInMA);
+        else ventValveCurrentLiveData.postValue(currentInMA);
     }
 
 
@@ -116,10 +123,11 @@ public class ValveService extends Service {
         double desiredCurrent = minCurrent + ((maxCurrent - minCurrent) * (pidOutput / 100.0));
 
         // 전류 값을 DAC의 16비트 값으로 변환 (0x0000 ~ 0xFFFF)
-        short dacValue = (short) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+        int dacValue = (int) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+        dacValue = Math.max(0, Math.min(0xFFFF, dacValue));
 
         // AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
-        ad5420.DaisyCurrentWrite((char) 0, dacValue);
+        ad5420.DaisyCurrentWrite((char) 0, (short) dacValue);
 
     }
 
@@ -135,10 +143,11 @@ public class ValveService extends Service {
         double desiredCurrent = minCurrent + ((maxCurrent - minCurrent) * (pidOutput / 100.0));
 
         // 전류 값을 DAC의 16비트 값으로 변환 (0x0000 ~ 0xFFFF)
-        short dacValue = (short) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+        int dacValue = (int) ((desiredCurrent - minCurrent) / (maxCurrent - minCurrent) * 0xFFFF);
+        dacValue = Math.max(0, Math.min(0xFFFF, dacValue));
 
         // AD5420에 전달 (0x0000은 채널 번호, dacValue는 전류 설정)
-        ad5420.DaisyCurrentWrite((char) 1, dacValue);
+        ad5420.DaisyCurrentWrite((char) 1, (short) dacValue);
 
     }
 

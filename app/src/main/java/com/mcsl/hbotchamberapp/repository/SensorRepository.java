@@ -10,7 +10,6 @@ import android.os.IBinder;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.Service.SensorService;
@@ -46,9 +45,7 @@ public class SensorRepository {
             SensorService.LocalBinder binder = (SensorService.LocalBinder) service;
             sensorService = binder.getService();
             isServiceBound = true;
-
-            // 센서 데이터 관찰
-            sensorService.getSensorData().observeForever(sensorDataObserver);
+            sensorService.setRepository(SensorRepository.this);
         }
 
         @Override
@@ -57,12 +54,9 @@ public class SensorRepository {
         }
     };
 
-    private Observer<SensorData> sensorDataObserver = new Observer<SensorData>() {
-        @Override
-        public void onChanged(SensorData data) {
-            sensorDataLiveData.postValue(data);
-        }
-    };
+    public void setSensorData(SensorData data) {
+        sensorDataLiveData.postValue(data);
+    }
 
     public LiveData<SensorData> getSensorData() {
         return sensorDataLiveData;
@@ -70,7 +64,6 @@ public class SensorRepository {
 
     public void unbindService() {
         if (isServiceBound) {
-            sensorService.getSensorData().removeObserver(sensorDataObserver);
             context.unbindService(serviceConnection);
             isServiceBound = false;
         }

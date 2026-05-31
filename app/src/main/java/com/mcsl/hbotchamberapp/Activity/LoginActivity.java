@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // 로그인 검증 메서드
     private void validateLogin(String username, String password) {
-        if (username.equals("admin") && password.equals("1234")) {
+        if (username.equals(BuildConfig.ADMIN_USERNAME) && password.equals(BuildConfig.ADMIN_PASSWORD)) {
             // 하드코딩된 관리자 계정 검증
             navigateToMenu();
         } else {

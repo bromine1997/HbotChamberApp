@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import io.socket.client.IO;
@@ -41,6 +42,7 @@ public class WebSocketService extends Service {
     private static final String TAG = "WebSocketService";
 
     private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> scheduledFuture;
 
     private static final long TRANSMISSION_INTERVAL = 1000; // 1초
 
@@ -203,7 +205,7 @@ public class WebSocketService extends Service {
     }
 
     private void startScheduledTransmission() {
-        scheduler.scheduleAtFixedRate(
+        scheduledFuture = scheduler.scheduleAtFixedRate(
                 this::sendCurrentSensorData,
                 0, // 초기 지연 없음
                 TRANSMISSION_INTERVAL, // 1초 간격
@@ -264,16 +266,9 @@ public class WebSocketService extends Service {
             pidRepository.getElapsedTime().removeObserver(elapsedTimeObserver);
             pidRepository.getSetPoint().removeObserver(setPointObserver);
 
-            // 스케줄된 작업 중단
-            if (scheduler != null && !scheduler.isShutdown()) {
-                scheduler.shutdown();
-                try {
-                    if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                        scheduler.shutdownNow();
-                    }
-                } catch (InterruptedException e) {
-                    scheduler.shutdownNow();
-                }
+            // 스케줄된 작업 중단 (스케줄러는 유지하여 재사용 가능하게 함)
+            if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
+                scheduledFuture.cancel(false);
             }
         }
     }
@@ -365,6 +360,7 @@ public class WebSocketService extends Service {
     @Override
     public void onDestroy() {
         stopSendingSensorData();
+        pidRepository.getSessionId().removeObserver(sessionIdObserver);
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdownNow();
         }
