@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.mcsl.hbotchamberapp.Controller.Ad5420;
 import com.mcsl.hbotchamberapp.Controller.PinController;
+import com.mcsl.hbotchamberapp.HardwareEmergencyManager;
 import com.mcsl.hbotchamberapp.repository.ValveRepository;
 
 public class ValveService extends Service {
@@ -61,6 +62,8 @@ public class ValveService extends Service {
             e.printStackTrace();
         }
         ad5420.Daisy_Setup();
+
+        HardwareEmergencyManager.getInstance().register(this);
     }
 
 
@@ -170,7 +173,8 @@ public class ValveService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // 리소스 정리 필요 시 추가
+        stopAllValves();
+        HardwareEmergencyManager.getInstance().unregister();
     }
 
 

@@ -50,7 +50,7 @@ public class ProfileRepository {
     private List<ProfileSection> convertToProfileSection(List<String[]> stringData) {
         List<ProfileSection> profileSections = new ArrayList<>();
         for (String[] section : stringData) {
-            if (section.length >= 3) {
+            if (section.length >= 4) {
                 float startPressure = Float.parseFloat(section[1]);
                 float endPressure = Float.parseFloat(section[2]);
                 float duration = Float.parseFloat(section[3]);

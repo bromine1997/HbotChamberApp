@@ -35,8 +35,8 @@ public class Max1032 {
     private static final int MAX1032_MODE_0 = 0x00;  // External clock mode
 
 
-    private static Spi spi5;
-    private static Gpio latch1;
+    private Spi spi5;
+    private Gpio latch1;
 
 
     public Max1032(int spiBus, int latchPin1 ) {
@@ -58,7 +58,7 @@ public class Max1032 {
 
     }
 
-    public static void Configuration(int channel, int mode) {
+    public void Configuration(int channel, int mode) {
 
         byte[] responseBytes = new byte[4]; // 응답을 저장할 배열
 
@@ -80,7 +80,7 @@ public class Max1032 {
     }
 
 
-    public static int Read(int channel) {
+    public int Read(int channel) {
 
         byte[] responseBytes = new byte[4]; // 응답을 저장할 배열
 

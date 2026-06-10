@@ -186,9 +186,11 @@ public class EditActivity extends AppCompatActivity {
 
         binding.buttonDecreaseTime.setOnClickListener(v -> {
             float currentValue = Float.parseFloat(binding.valueTime.getText().toString());
-            currentValue -= 1;
-            binding.valueTime.setText(String.format(Locale.US, "%.1f", currentValue));
-            updateCurrentSectionData();
+            if (currentValue > 1.0f) {
+                currentValue -= 1;
+                binding.valueTime.setText(String.format(Locale.US, "%.1f", currentValue));
+                updateCurrentSectionData();
+            }
         });
 
         binding.buttonIncreaseTime.setOnClickListener(v -> {

@@ -61,6 +61,9 @@ public class Co2Sensor {
         return dataReadingExecutor.submit(new Callable<String>() {
             @Override
             public String call() throws Exception {
+                if (UART0 == null) {
+                    throw new Exception("UART 미초기화 — CO2 센서 미연결");
+                }
                 try {
                     flush();
                     UART0.writeStr(message);
@@ -111,7 +114,8 @@ public class Co2Sensor {
 //
     public void flush() {
         if (UART0 != null) {
-            while (UART0.dataAvailable()) {
+            int maxIterations = 50;
+            while (UART0.dataAvailable() && maxIterations-- > 0) {
                 UART0.readStr(SPRINT_BUFSIZE);
             }
         }
@@ -119,6 +123,8 @@ public class Co2Sensor {
 
     // 리소스 정리
     public void cleanup() {
-        UART0.delete(); // UART 인터페이스 닫기
+        if (UART0 != null) {
+            UART0.delete();
+        }
     }
 }

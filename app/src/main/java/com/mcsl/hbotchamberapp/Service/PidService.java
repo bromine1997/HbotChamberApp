@@ -65,6 +65,14 @@ public class PidService extends Service {
     private int currentSection = 0;
     private long sectionStartElapsed = 0;
 
+    private double previousPressure = -1;
+    private long lastSensorUpdateTime = 0;
+
+    private static final double PRESSURE_MIN = 0.5;
+    private static final double PRESSURE_MAX = 4.0;
+    private static final double EMERGENCY_DROP_THRESHOLD = 0.3; // ATA/s 이상 급강하 시 응급 배기로 판단
+    private static final long SENSOR_STALE_TIMEOUT_MS = 5000;   // 5초간 갱신 없으면 센서 연결 끊김
+
     private enum Phase {
         PRESSURE_INCREASE,
         PRESSURE_HOLD,
@@ -106,7 +114,28 @@ public class PidService extends Service {
     private Observer<SensorData> sensorDataObserver = new Observer<SensorData>() {
         @Override
         public void onChanged(SensorData data) {
-            currentPressure = data.getPressure();
+            double pressure = data.getPressure();
+
+            if (pressure < PRESSURE_MIN || pressure > PRESSURE_MAX) {
+                Log.w(TAG, "이상 압력값 무시: " + pressure);
+                return;
+            }
+
+            if (previousPressure > 0
+                    && (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD)
+                    && (previousPressure - pressure) > EMERGENCY_DROP_THRESHOLD) {
+                Log.e(TAG, "응급 배기 감지: " + previousPressure + " → " + pressure);
+                stopPIDControl();
+                sendSafetyErrorBroadcast("응급 배기 감지: 압력 급강하 ("
+                        + String.format("%.2f", previousPressure) + " → "
+                        + String.format("%.2f", pressure) + " ATA)");
+                stopSelf();
+                return;
+            }
+
+            previousPressure = pressure;
+            currentPressure = pressure;
+            lastSensorUpdateTime = System.currentTimeMillis();
         }
     };
 
@@ -142,7 +171,17 @@ public class PidService extends Service {
 
             @Override
             public void run() {
+                try {
                 if (isPaused) {
+                    return;
+                }
+
+                if (lastSensorUpdateTime > 0
+                        && System.currentTimeMillis() - lastSensorUpdateTime > SENSOR_STALE_TIMEOUT_MS) {
+                    Log.e(TAG, "센서 데이터 갱신 없음 — PID 정지");
+                    stopPIDControl();
+                    sendSafetyErrorBroadcast("센서 연결 끊김: 센서 데이터 갱신이 중단되었습니다");
+                    stopSelf();
                     return;
                 }
 
@@ -187,19 +226,24 @@ public class PidService extends Service {
 
                     pidRepository.setSetPoint(setPoint);
 
-                    if (currentSection > 0) {
-                        String[] previousSection = profileData.get(currentSection - 1);
-                        double previousEndPressure = Double.parseDouble(previousSection[2]);
-
-                        if (endPressure > previousEndPressure) {
-                            currentPhase = Phase.PRESSURE_INCREASE;
-                        } else if (endPressure < previousEndPressure) {
-                            currentPhase = Phase.PRESSURE_DECREASE;
-                        } else {
-                            currentPhase = Phase.PRESSURE_HOLD;
-                        }
+                    // Phase 결정: advance 후의 현재 구간 기준으로 비교 (off-by-one 수정)
+                    Phase newPhase;
+                    if (currentSection == 0) {
+                        newPhase = Phase.PRESSURE_INCREASE;
+                    } else if (currentSection < profileData.size()) {
+                        double activeEnd = Double.parseDouble(profileData.get(currentSection)[2]);
+                        double prevEnd = Double.parseDouble(profileData.get(currentSection - 1)[2]);
+                        if (activeEnd > prevEnd) newPhase = Phase.PRESSURE_INCREASE;
+                        else if (activeEnd < prevEnd) newPhase = Phase.PRESSURE_DECREASE;
+                        else newPhase = Phase.PRESSURE_HOLD;
                     } else {
-                        currentPhase = Phase.PRESSURE_INCREASE;
+                        newPhase = currentPhase;
+                    }
+
+                    if (newPhase != currentPhase) {
+                        pressPidController.reset();
+                        ventPidController.reset();
+                        currentPhase = newPhase;
                     }
 
                     pidRepository.setPidPhase(currentPhase.toString());
@@ -208,12 +252,16 @@ public class PidService extends Service {
                     if (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD) {
                         output = pressPidController.getOutput(currentPressure, setPoint);
                         controlPressValve(output);
-                        //Log.d(TAG, "가압 중");
                     } else if (currentPhase == Phase.PRESSURE_DECREASE) {
                         output = ventPidController.getOutput(currentPressure, setPoint);
                         controlVentValve(output);
-                        //Log.d(TAG, "감압 중");
                     }
+                }
+                } catch (Exception e) {
+                    Log.e(TAG, "PID 루프 예외: " + e.getMessage(), e);
+                    stopPIDControl();
+                    sendSafetyErrorBroadcast("PID 내부 오류: " + e.getMessage());
+                    stopSelf();
                 }
             }
         }, 0, 1, TimeUnit.SECONDS);
@@ -246,6 +294,8 @@ public class PidService extends Service {
         // [수정] STOP 시 구간 상태도 초기화
         currentSection = 0;
         sectionStartElapsed = 0;
+        previousPressure = -1;
+        lastSensorUpdateTime = 0;
 
         sendPidControlStatusBroadcast("PID_CONTROL_STOPPED");
 
@@ -265,7 +315,8 @@ public class PidService extends Service {
         if (isPaused) {
             totalPausedDuration += System.currentTimeMillis() - pauseStartTime;
             isPaused = false;
-            pidRepository.setPidState(PIDState.RUNNING); // 상태 업데이트
+            lastSensorUpdateTime = System.currentTimeMillis(); // 장시간 일시정지 후 stale 오탐 방지
+            pidRepository.setPidState(PIDState.RUNNING);
             sendPidControlStatusBroadcast("PID_CONTROL_RESUMED");
         }
     }
@@ -326,9 +377,14 @@ public class PidService extends Service {
         return totalTime;
     }
 
-    // 브로드캐스트를 전송하는 메서드 추가
     private void sendPidControlStatusBroadcast(String action) {
         Intent intent = new Intent(action);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendSafetyErrorBroadcast(String message) {
+        Intent intent = new Intent("PID_SAFETY_ERROR");
+        intent.putExtra("message", message);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

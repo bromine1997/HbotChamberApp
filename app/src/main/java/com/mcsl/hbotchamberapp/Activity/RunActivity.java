@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.mcsl.hbotchamberapp.ViewModel.RunViewModel;
 import com.mcsl.hbotchamberapp.databinding.ActivityRunBinding;
@@ -36,6 +37,21 @@ public class RunActivity extends AppCompatActivity {
         }
     };
 
+    private final BroadcastReceiver wsConnectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isConnected = intent.getBooleanExtra("isConnected", true);
+            binding.wsStatusBanner.setVisibility(isConnected ? View.GONE : View.VISIBLE);
+        }
+    };
+
+    private final BroadcastReceiver sensorErrorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showSafetyAlert("센서 연결 오류: 센서 데이터를 읽을 수 없습니다.\nPID 제어가 자동 정지됩니다.");
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +64,10 @@ public class RunActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 safetyErrorReceiver, new IntentFilter("PID_SAFETY_ERROR"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                wsConnectionReceiver, new IntentFilter("WEBSOCKET_CONNECTION_STATUS"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                sensorErrorReceiver, new IntentFilter("SENSOR_CONNECTION_ERROR"));
 
         // Observe LiveData from ViewModel
         setupObservers();
@@ -92,6 +112,7 @@ public class RunActivity extends AppCompatActivity {
 
         // Observe sensor data
         viewModel.getSensorData().observe(this, sensorData -> {
+            if (sensorData == null) return;
             PIDState currentState = viewModel.getPidState().getValue();
             if (currentState == PIDState.STARTED || currentState == PIDState.RUNNING) {
                 long elapsedTime = viewModel.getElapsedTime().getValue() != null
@@ -188,6 +209,8 @@ public class RunActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(safetyErrorReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wsConnectionReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(sensorErrorReceiver);
         binding = null;
     }
 }

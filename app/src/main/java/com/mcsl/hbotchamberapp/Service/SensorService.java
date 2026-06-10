@@ -18,6 +18,7 @@ import com.mcsl.hbotchamberapp.model.SensorData;
 import com.mcsl.hbotchamberapp.repository.SensorRepository;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,9 @@ public class SensorService extends Service {
 
     private double temperature, humidity, flowRate, pressure, oxygen;
     private int co2Ppm;
+
+    private int consecutiveSensorErrors = 0;
+    private static final int MAX_CONSECUTIVE_ERRORS = 3;
 
     private final IBinder binder = new LocalBinder();
     private final MutableLiveData<SensorData> sensorDataLiveData = new MutableLiveData<>();
@@ -59,12 +63,21 @@ public class SensorService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        // 센서 초기화
-        multiSensor = new Max1032(1, 18);
-        multiSensor.ConfigAllChannels();
+        try {
+            multiSensor = new Max1032(1, 18);
+            multiSensor.ConfigAllChannels();
+        } catch (Exception e) {
+            Log.e(TAG, "SPI 센서 초기화 실패", e);
+            multiSensor = null;
+        }
 
-        co2sensor = new Co2Sensor();
-        co2sensor.init();
+        try {
+            co2sensor = new Co2Sensor();
+            co2sensor.init();
+        } catch (Exception e) {
+            Log.e(TAG, "CO2 센서 초기화 실패", e);
+            co2sensor = null;
+        }
 
         // 브로드캐스트를 위한 Intent
         sensorDataIntent = new Intent("com.mcsl.hbotchamberapp.SENSOR_UPDATE");
@@ -92,17 +105,17 @@ public class SensorService extends Service {
     // 모든 센서 값을 읽고, Intent에 담아 브로드캐스트
     private void readAllSensorValues() {
         try {
-            // SPI로 모든 ADC 값을 읽음
+            if (multiSensor == null) {
+                throw new Exception("SPI 센서 미연결");
+            }
             readAdcValues();
 
-            // UART로 CO2 값을 읽음 (비동기)
-            Future<String> futureCo2Data = co2sensor.loopbackCommand("Q\r\n");
-            String co2Data = futureCo2Data.get();
-            co2Ppm = parseCo2Value(co2Data);
+            if (co2sensor != null) {
+                Future<String> futureCo2Data = co2sensor.loopbackCommand("Q\r\n");
+                String co2Data = futureCo2Data.get(3, TimeUnit.SECONDS);
+                co2Ppm = parseCo2Value(co2Data);
+            }
 
-            co2Ppm = parseCo2Value(co2Data);
-
-            // Intent에 모든 센서 값을 담음
             sensorDataIntent.putExtra("temperature", temperature);
             sensorDataIntent.putExtra("humidity", humidity);
             sensorDataIntent.putExtra("flowRate", flowRate);
@@ -117,29 +130,23 @@ public class SensorService extends Service {
                 sensorDataLiveData.postValue(data);
             }
 
-            // 한 번에 브로드캐스트 전송
             LocalBroadcastManager.getInstance(this).sendBroadcast(sensorDataIntent);
+
+            consecutiveSensorErrors = 0;
+
         } catch (Exception e) {
             Log.e(TAG, "센서 데이터 읽기 오류", e);
-
-            // 오류 발생 시 기본값으로 브로드캐스트
-            sensorDataIntent.putExtra("co2Ppm", 9999);
-            sensorDataIntent.putExtra("temperature", -999);
-            sensorDataIntent.putExtra("humidity", -999);
-            sensorDataIntent.putExtra("flowRate", -999);
-            sensorDataIntent.putExtra("pressure", -999);
-            sensorDataIntent.putExtra("oxygen", -999);
-
-            SensorData errorData = new SensorData(-999, -999, -999, -999, -999, -999);
-            if (sensorRepository != null) {
-                sensorRepository.setSensorData(errorData);
-            } else {
-                sensorDataLiveData.postValue(errorData);
+            consecutiveSensorErrors++;
+            // 이상값(-999)은 PID에 전달하지 않음 — PidService의 stale 감지가 처리
+            if (consecutiveSensorErrors >= MAX_CONSECUTIVE_ERRORS) {
+                sendSensorErrorBroadcast();
             }
-
-
-            LocalBroadcastManager.getInstance(this).sendBroadcast(sensorDataIntent);
         }
+    }
+
+    private void sendSensorErrorBroadcast() {
+        Intent intent = new Intent("SENSOR_CONNECTION_ERROR");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     // SPI 센서 값 읽기
@@ -172,7 +179,8 @@ public class SensorService extends Service {
     private double calibrateTempeValue(int rawTempValue) {
         int ADC_min = 2675;
         int ADC_max = 13305;
-        double currentInMilliAmps = 4.0 + ((double) (rawTempValue - ADC_min) / (ADC_max - ADC_min)) * (20.0 - 4.0);
+        int clamped = Math.max(ADC_min, Math.min(ADC_max, rawTempValue));
+        double currentInMilliAmps = 4.0 + ((double) (clamped - ADC_min) / (ADC_max - ADC_min)) * (20.0 - 4.0);
         double temperature = ((currentInMilliAmps - 4.0) / 0.1524) - 30.0;
         return Math.round(temperature * 100.0) / 100.0;
     }
@@ -180,7 +188,8 @@ public class SensorService extends Service {
     private double calibrateHumidityValue(int rawHumidityValue) {
         int ADC_min = 2675;
         int ADC_max = 13305;
-        double currentInMilliAmps = 4.0 + ((double) (rawHumidityValue - ADC_min) / (ADC_max - ADC_min)) * (20.0 - 4.0);
+        int clamped = Math.max(ADC_min, Math.min(ADC_max, rawHumidityValue));
+        double currentInMilliAmps = 4.0 + ((double) (clamped - ADC_min) / (ADC_max - ADC_min)) * (20.0 - 4.0);
         double humidity = (currentInMilliAmps - 4.0) / 0.16;
         return Math.round(humidity * 100.0) / 100.0;
     }
@@ -188,7 +197,8 @@ public class SensorService extends Service {
     private double calibrateFlowValue(int rawFlowValue) {
         int ADC_min = 2675;
         int ADC_max = 13305;
-        double currentInMilliAmps = 4.0 + ((double) (rawFlowValue - ADC_min) / (ADC_max - ADC_min)) * (20.0 - 4.0);
+        int clamped = Math.max(ADC_min, Math.min(ADC_max, rawFlowValue));
+        double currentInMilliAmps = 4.0 + ((double) (clamped - ADC_min) / (ADC_max - ADC_min)) * (20.0 - 4.0);
         double flowRate = (currentInMilliAmps - 4.0) * (100.0 / 16.0);
         return Math.round(flowRate * 100.0) / 100.0;
     }
@@ -196,14 +206,16 @@ public class SensorService extends Service {
     private double calibratePressureValue(int rawPressureValue) {
         int ADC_min = 2675;
         int ADC_max = 13305;
-        double pressure = 1.0 + ((double) (rawPressureValue - ADC_min) / (ADC_max - ADC_min)) * (3.5 - 1);
+        int clamped = Math.max(ADC_min, Math.min(ADC_max, rawPressureValue));
+        double pressure = 1.0 + ((double) (clamped - ADC_min) / (ADC_max - ADC_min)) * (3.5 - 1);
         return Math.round(pressure * 100.0) / 100.0;
     }
 
     private double calibrateOxygenValue(int rawOxygenValue) {
         int a0 = 46;
         int a1 = 8045;
-        double O2Value = ((double) (rawOxygenValue - a0)) * 2090.0 / (double) (a1 - a0);
+        int clamped = Math.max(a0, Math.min(a1, rawOxygenValue));
+        double O2Value = ((double) (clamped - a0)) * 2090.0 / (double) (a1 - a0);
         return Math.round(O2Value) / 100.0;
     }
 
@@ -218,6 +230,9 @@ public class SensorService extends Service {
         Log.d(TAG, "Sensor 서비스가 종료되었습니다.");
         handler.removeCallbacks(sensorReadRunnable);
         handler.getLooper().quit();
+        if (co2sensor != null) {
+            co2sensor.cleanup();
+        }
     }
 
 

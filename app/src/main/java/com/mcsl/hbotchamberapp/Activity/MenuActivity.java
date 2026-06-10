@@ -19,6 +19,8 @@ public class MenuActivity extends AppCompatActivity {
     private Intent SensorServiceIntent;
 
     private Intent ValveServiceIntent;
+    private Intent WebSocketServiceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +39,8 @@ public class MenuActivity extends AppCompatActivity {
         startService(ValveServiceIntent);
 
         // WebSocketService 시작
-        Intent intent = new Intent(this, WebSocketService.class);
-        startService(intent);
+        WebSocketServiceIntent = new Intent(this, WebSocketService.class);
+        startService(WebSocketServiceIntent);
 
 
         // 버튼 클릭 리스너 설정
@@ -72,10 +74,10 @@ public class MenuActivity extends AppCompatActivity {
         binding.exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 앱 종료
                 stopService(GpioServiceIntent);
                 stopService(SensorServiceIntent);
                 stopService(ValveServiceIntent);
+                stopService(WebSocketServiceIntent);
                 finish();
             }
         });
@@ -85,9 +87,9 @@ public class MenuActivity extends AppCompatActivity {
 
     protected void onDestroy() {
         super.onDestroy();
-        // GPIOService 종료
         stopService(GpioServiceIntent);
         stopService(SensorServiceIntent);
         stopService(ValveServiceIntent);
-    };
+        stopService(WebSocketServiceIntent);
+    }
 }

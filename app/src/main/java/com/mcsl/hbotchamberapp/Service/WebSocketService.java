@@ -178,16 +178,12 @@ public class WebSocketService extends Service {
             Log.d(TAG, "Received broadcast: " + action);
             if ("PID_CONTROL_STARTED".equals(action)) {
                 startSendingSensorData();
-                pidRepository.setPidState(PIDState.STARTED);
             } else if ("PID_CONTROL_PAUSED".equals(action)) {
                 stopSendingSensorData();
-                pidRepository.setPidState(PIDState.PAUSED);
             } else if ("PID_CONTROL_RESUMED".equals(action)) {
                 startSendingSensorData();
-                pidRepository.setPidState(PIDState.RUNNING);
             } else if ("PID_CONTROL_STOPPED".equals(action)) {
                 stopSendingSensorData();
-                pidRepository.setPidState(PIDState.STOPPED);
             }
         }
     };
@@ -205,10 +201,13 @@ public class WebSocketService extends Service {
     }
 
     private void startScheduledTransmission() {
+        if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
+            scheduledFuture.cancel(false);
+        }
         scheduledFuture = scheduler.scheduleAtFixedRate(
                 this::sendCurrentSensorData,
-                0, // 초기 지연 없음
-                TRANSMISSION_INTERVAL, // 1초 간격
+                0,
+                TRANSMISSION_INTERVAL,
                 TimeUnit.MILLISECONDS
         );
     }
@@ -327,14 +326,11 @@ public class WebSocketService extends Service {
     }
 
     private void saveSensorDataLocally(SensorDataPacket packet) {
-        // 로컬에 SensorDataPacket을 저장하는 로직 구현
-        // 파일로 저장하거나 로컬 DB에 저장
         try {
             File file = new File(getFilesDir(), "sensor_data_packet.json");
-            FileWriter writer = new FileWriter(file, true);
-            String jsonData = gson.toJson(packet);
-            writer.append(jsonData).append("\n");
-            writer.close();
+            try (FileWriter writer = new FileWriter(file, true)) {
+                writer.append(gson.toJson(packet)).append("\n");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
