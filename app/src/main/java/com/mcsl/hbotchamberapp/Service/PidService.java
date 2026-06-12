@@ -241,8 +241,18 @@ public class PidService extends Service {
                     }
 
                     if (newPhase != currentPhase) {
-                        pressPidController.reset();
-                        ventPidController.reset();
+                        boolean wasPress = (currentPhase == Phase.PRESSURE_INCREASE || currentPhase == Phase.PRESSURE_HOLD);
+                        boolean willPress = (newPhase == Phase.PRESSURE_INCREASE || newPhase == Phase.PRESSURE_HOLD);
+
+                        if (wasPress && !willPress) {
+                            // 가압→감압: vent 컨트롤러를 press의 마지막 출력으로 초기화
+                            ventPidController.initForBumplessTransfer(currentPressure, setPoint, pressPidController.getLastOutput());
+                        } else if (!wasPress && willPress) {
+                            // 감압→가압: press 컨트롤러를 vent의 마지막 출력으로 초기화
+                            pressPidController.initForBumplessTransfer(currentPressure, setPoint, ventPidController.getLastOutput());
+                        }
+                        // INCREASE↔HOLD: 같은 pressPidController 사용 — reset 불필요
+
                         currentPhase = newPhase;
                     }
 

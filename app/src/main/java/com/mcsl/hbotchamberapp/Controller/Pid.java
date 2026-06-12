@@ -356,6 +356,38 @@ public class Pid {
     }
 
     /**
+     * Returns the last computed output value.
+     * Used by the caller to seed a new controller for bumpless transfer.
+     */
+    public double getLastOutput(){
+        return lastOutput;
+    }
+
+    /**
+     * Initializes the controller state so the first output equals targetOutput.
+     * Call this instead of reset() when switching between controllers to avoid
+     * a sudden jump in valve command (bumpless transfer).
+     *
+     * @param actual      current measured value (e.g. chamber pressure)
+     * @param setpoint    current setpoint
+     * @param targetOutput desired first output of this controller
+     */
+    public void initForBumplessTransfer(double actual, double setpoint, double targetOutput){
+        double error = setpoint - actual;
+        lastActual = actual;
+        lastOutput = targetOutput;
+        firstRun = false;
+        if(I != 0){
+            errorSum = (targetOutput - P * error - F * setpoint) / I;
+            if(maxError != 0){
+                errorSum = constrain(errorSum, -maxError, maxError);
+            }
+        } else {
+            errorSum = 0;
+        }
+    }
+
+    /**
      * Set the maximum rate the output can increase per cycle.<br>
      * This can prevent sharp jumps in output when changing setpoints or
      * enabling a PID system, which might cause stress on physical or electrical
